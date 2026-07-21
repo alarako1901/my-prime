@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Prime - 66 Días</title>
 
     <!-- PWA: instalable como app en iPhone -->
@@ -19,7 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         html, body { width: 100%; height: 100%; }
 
@@ -28,6 +28,8 @@
             background: #ffffff;
             padding: 20px 12px;
             overflow-x: hidden;
+            /* Sin zoom por doble toque: cada tap responde al instante */
+            touch-action: manipulation;
         }
 
         .container { max-width: 500px; width: 100%; margin: 0 auto; }
@@ -454,6 +456,9 @@
             padding: 40px 30px;
             text-align: center;
             cursor: pointer;
+            /* Evita que los toques rápidos seleccionen/dupliquen el texto */
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .intro.hidden { display: none; }
@@ -529,7 +534,7 @@
             border: 2px solid #1a1a1a;
             border-radius: 8px;
             padding: 12px;
-            font-size: 14px;
+            font-size: 16px; /* 16px evita el auto-zoom de iOS al enfocar */
             font-weight: 600;
             font-family: 'Helvetica Neue', Arial, sans-serif;
             text-align: center;
@@ -592,7 +597,7 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.35);
-            z-index: 90;
+            z-index: 120;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -820,22 +825,22 @@
 
         <!-- Paso final: el usuario digita SUS 4 hábitos con su ícono -->
         <div class="setup" id="setup" onclick="event.stopPropagation()">
-            <div class="setup-sub">digita tus 4 hábitos</div>
+            <div class="setup-sub">digita tus 4 hábitos — uno por pilar: cuerpo, mente, corazón, alma</div>
             <div class="setup-row">
                 <button class="icon-chip" id="chip0" onclick="openIconPicker(0)"></button>
-                <input class="setup-input" id="hab1" maxlength="18" placeholder="hábito 1" autocomplete="off">
+                <input class="setup-input" id="hab1" maxlength="18" placeholder="cuerpo · ej. entrenar" autocomplete="off">
             </div>
             <div class="setup-row">
                 <button class="icon-chip" id="chip1" onclick="openIconPicker(1)"></button>
-                <input class="setup-input" id="hab2" maxlength="18" placeholder="hábito 2" autocomplete="off">
+                <input class="setup-input" id="hab2" maxlength="18" placeholder="mente · ej. leer" autocomplete="off">
             </div>
             <div class="setup-row">
                 <button class="icon-chip" id="chip2" onclick="openIconPicker(2)"></button>
-                <input class="setup-input" id="hab3" maxlength="18" placeholder="hábito 3" autocomplete="off">
+                <input class="setup-input" id="hab3" maxlength="18" placeholder="corazón · ej. llamar a mamá" autocomplete="off">
             </div>
             <div class="setup-row">
                 <button class="icon-chip" id="chip3" onclick="openIconPicker(3)"></button>
-                <input class="setup-input" id="hab4" maxlength="18" placeholder="hábito 4" autocomplete="off">
+                <input class="setup-input" id="hab4" maxlength="18" placeholder="alma · ej. orar" autocomplete="off">
             </div>
             <button class="setup-start" id="setupStart" onclick="startChallenge(event)">empezar</button>
         </div>
@@ -948,18 +953,34 @@
             '<rect width="18" height="11" x="3" y="11" rx="2"/>' +
             '<path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
-        // ============ ÍCONOS DE HÁBITOS (estilo Lucide, mismo trazo de la app) ============
+        // ============ ÍCONOS DE HÁBITOS (20, estilo Lucide) ============
+        // Basados en los hábitos más comunes, apoyados en los 4 pilares:
+        // CUERPO, MENTE, CORAZÓN y ALMA
         const HABIT_ICONS = {
-            sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
-            moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
-            activity: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"/>',
-            book: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
-            heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
-            droplet: '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
-            pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
-            phone: '<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
-            dollar: '<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
-            zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>'
+            // — CUERPO —
+            sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>', // despertar temprano
+            moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>', // dormir temprano
+            dumbbell: '<path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1 2.828-2.829l2.829 2.829a2 2 0 1 1-2.829 2.829z"/>', // entrenar
+            activity: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"/>', // cardio / caminar
+            droplet: '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>', // tomar agua
+            snowflake: '<path d="M12 2v20"/><path d="M2 12h20"/><path d="m4.9 4.9 14.2 14.2"/><path d="m19.1 4.9-14.2 14.2"/>', // ducha fría
+            apple: '<path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 4.83c-1.45 0-2.63.86-3.5.86s-2.05-.86-3.5-.86A4.9 4.9 0 0 0 5 9.78C5 14 8 22 11 22c1.25 0 2.5-1.06 4-1.06z"/><path d="M10 2c1 .5 2 2 2 5"/>', // comer sano
+            // — MENTE —
+            book: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>', // leer
+            cap: '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>', // estudiar
+            pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>', // escribir / journal
+            phone: '<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>', // no scrolling
+            target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>', // enfoque / deep work
+            clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>', // puntualidad / rutina
+            music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>', // instrumento
+            // — CORAZÓN —
+            heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>', // familia / gratitud
+            home: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>', // tiempo en casa
+            dollar: '<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', // ahorrar
+            coffee: '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/>', // menos café / compartir uno
+            // — ALMA —
+            wind: '<path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/>', // respirar / meditar
+            zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>' // orar / propósito
         };
 
         const ICON_IDS = Object.keys(HABIT_ICONS);
@@ -1486,7 +1507,8 @@
         }
 
         // ============ PASO: DIGITA TUS 4 HÁBITOS (con ícono) ============
-        const setupIcons = ['sun', 'activity', 'book', 'moon']; // sugeridos, cambiables
+        // Sugeridos por pilar: cuerpo, mente, corazón, alma (cambiables)
+        const setupIcons = ['dumbbell', 'book', 'heart', 'zap'];
 
         function renderChips() {
             for (let i = 0; i < 4; i++) {
