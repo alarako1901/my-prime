@@ -1,6 +1,9 @@
-// Service Worker de My Prime — permite instalar la app y usarla sin conexión
-const CACHE = 'mi-prime-v1';
-const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+// Service Worker de My Prime — v2
+// Estrategia:
+//  - HTML: network-first → cada deploy nuevo llega al instante (antes se quedaba en caché)
+//  - Íconos/manifest: cache-first → carga inmediata
+const CACHE = 'my-prime-v2';
+const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
@@ -17,7 +20,29 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
-  );
+  const req = e.request;
+  const isHTML = req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
+
+  if (isHTML) {
+    // Red primero; si no hay conexión, usar la copia guardada
+    e.respondWith(
+      fetch(req)
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req).then(m => m || caches.match('./index.html')))
+    );
+  } else {
+    // Caché primero; si no está, ir a la red y guardar
+    e.respondWith(
+      caches.match(req).then(cached => cached || fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
+        return res;
+      }))
+    );
+  }
 });

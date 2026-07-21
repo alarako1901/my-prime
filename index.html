@@ -13,6 +13,9 @@
     <meta name="apple-mobile-web-app-title" content="My Prime">
     <link rel="apple-touch-icon" href="icon-180.png">
 
+    <!-- RENDIMIENTO: preconexión a las fuentes para que el texto no demore -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
@@ -49,7 +52,7 @@
             margin-top: 8px;
         }
 
-        /* ============ NIVELES (ARRIBA DE TODO) ============ */
+        /* ============ NIVELES ============ */
         .levels {
             display: flex;
             justify-content: center;
@@ -77,10 +80,7 @@
         }
 
         .level.reached { color: #1a1a1a; font-weight: 600; }
-        .level.reached .dot {
-            background: #00d084;
-            border-color: #00d084;
-        }
+        .level.reached .dot { background: #00d084; border-color: #00d084; }
 
         .level-line {
             width: 40px;
@@ -90,12 +90,8 @@
             margin-bottom: 16px;
         }
 
-        /* ============ LAYOUT: HABITOS (fijo) | DÍAS (scroll) | PRIME (fijo) ============ */
-        .board {
-            display: flex;
-            width: 100%;
-            background: #ffffff;
-        }
+        /* ============ TABLERO ============ */
+        .board { display: flex; width: 100%; background: #ffffff; }
 
         :root {
             --h-header: 95px;
@@ -150,10 +146,13 @@
         .col-habitos-w .cell {
             justify-content: flex-start;
             padding-left: 10px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: -0.5px;
             border-right: 0.5px solid #e0e0e0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .col-prime-w .cell {
@@ -162,7 +161,7 @@
             border-left: 0.5px solid #e0e0e0;
         }
 
-        /* ============ ZONA DE DÍAS (SCROLL HORIZONTAL) ============ */
+        /* ============ DÍAS (SCROLL) ============ */
         .days-scroll {
             flex: 1;
             overflow-x: auto;
@@ -207,13 +206,11 @@
 
         .day-col .cell.last { border-bottom: 0.5px solid #1a1a1a; }
 
-        /* IMPORTANTE: las LÍNEAS nunca pierden opacidad.
-           El desvanecido se aplica SOLO al contenido (header y checkbox),
-           no a la columna entera — así los bordes quedan fijos siempre. */
+        /* Las LÍNEAS nunca pierden opacidad — solo el contenido */
         .day-col.locked .head > * { opacity: 0.4; }
         .day-col.locked .day-checkbox { opacity: 0.4; }
 
-        /* ============ ICONO CALENDARIO (Lucide "calendar") ============ */
+        /* ============ ICONO CALENDARIO ============ */
         .calendar-icon { width: 30px; height: 30px; flex-shrink: 0; }
         .day-col.locked .calendar-icon { width: 23px; height: 23px; }
 
@@ -245,7 +242,7 @@
             align-items: center;
             justify-content: center;
             background: white;
-            transition: all 0.2s ease;
+            transition: background 0.15s ease, border-color 0.15s ease;
             color: #1a1a1a;
             flex-shrink: 0;
         }
@@ -264,10 +261,7 @@
             color: white;
         }
 
-        .day-col.locked .day-checkbox.checked {
-            background: #999;
-            border-color: #999;
-        }
+        .day-col.locked .day-checkbox.checked { background: #999; border-color: #999; }
 
         .day-checkbox::after {
             content: '';
@@ -280,7 +274,7 @@
 
         .day-checkbox.checked::after { display: block; }
 
-        /* ============ PRIME (porcentaje + círculo) ============ */
+        /* ============ PRIME (celda) ============ */
         .percentage {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             font-size: 12px;
@@ -344,7 +338,7 @@
             font-size: 28px;
             font-weight: 600;
             color: #1a1a1a;
-            transition: all 0.2s ease;
+            transition: transform 0.15s ease, background 0.15s ease;
         }
 
         .add-button:hover { background: #f9f9f9; }
@@ -357,7 +351,13 @@
             text-align: center;
         }
 
-        /* ============ PROGRESO DIARIO (gráfico de puntos) ============ */
+        .add-count {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 10px;
+            color: #999;
+        }
+
+        /* ============ PROGRESO (gráfico) ============ */
         .progress-section { margin-top: 30px; }
 
         .section-title {
@@ -380,20 +380,10 @@
             fill: #999;
         }
 
-        /* Relleno bajo la línea: verde TRANSPARENTE */
-        .chart-area {
-            fill: rgba(0, 208, 132, 0.12);
-            stroke: none;
-        }
+        .chart-area { fill: rgba(0, 208, 132, 0.12); stroke: none; }
 
-        /* Línea conectora: VERDE, más delgada que el círculo */
-        .chart-line {
-            fill: none;
-            stroke: #00d084;
-            stroke-width: 1.5;
-        }
+        .chart-line { fill: none; stroke: #00d084; stroke-width: 1.5; }
 
-        /* Puntos: círculos grandes verdes */
         .chart-dot { fill: #00d084; }
 
         /* ============ PRIME TOTAL ============ */
@@ -451,7 +441,7 @@
             text-align: center;
         }
 
-        /* ============ INTRO (primera apertura) ============ */
+        /* ============ INTRO ============ */
         .intro {
             position: fixed;
             inset: 0;
@@ -510,20 +500,230 @@
             color: #1a1a1a;
             cursor: pointer;
             display: none;
-            transition: all 0.2s ease;
+            transition: transform 0.15s ease;
         }
 
         .intro-start:active { transform: scale(0.96); }
         .intro-start.visible { display: block; }
+
+        /* Paso final de la intro: digitar tus 4 hábitos */
+        .setup {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
+        }
+
+        .setup.visible { display: flex; }
+
+        .setup-sub {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .setup-input {
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            text-align: center;
+            background: #ffffff;
+            color: #1a1a1a;
+            outline: none;
+            width: 100%;
+        }
+
+        .setup-input::placeholder { color: #ccc; font-weight: 400; }
+
+        .setup-start {
+            margin-top: 12px;
+            padding: 14px 40px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 30px;
+            background: white;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .setup-start.ready { opacity: 1; pointer-events: auto; }
+        .setup-start:active { transform: scale(0.96); }
+
+        /* ============ MENÚ LATERAL (hamburguesa) ============ */
+        .menu-btn {
+            position: fixed;
+            top: 14px; left: 14px;
+            width: 40px; height: 40px;
+            background: #ffffff;
+            border: none;
+            cursor: pointer;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 0;
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #1a1a1a;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 60;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .menu-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .drawer {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 250px;
+            background: #ffffff;
+            z-index: 70;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 0.5px solid #1a1a1a;
+        }
+
+        .drawer.open { transform: translateX(0); }
+
+        .drawer-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding-bottom: 12px;
+            border-bottom: 0.5px solid #1a1a1a;
+        }
+
+        .drawer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            background: none;
+            border: none;
+            padding: 8px 0;
+            cursor: pointer;
+            text-align: left;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            border-bottom: 0.5px solid #e0e0e0;
+        }
+
+        .drawer-item .hint {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 10px;
+            color: #999;
+            font-weight: 400;
+        }
+
+        /* Switch de modo oscuro */
+        .switch {
+            width: 40px; height: 22px;
+            border: 1.5px solid #1a1a1a;
+            border-radius: 12px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            transition: left 0.2s ease;
+        }
+
+        .switch.on::after { left: 20px; background: #00d084; }
+
+        /* ============ MODO OSCURO ============ */
+        /* Invierte lo blanco a negro y lo negro a blanco (verde se conserva) */
+        html.dark { background: #000; }
+        html.dark body { filter: invert(1) hue-rotate(180deg); }
+
+        /* ============ DÍAS BLOQUEADOS (candado) ============ */
+        .lock-icon { width: 26px; height: 26px; flex-shrink: 0; }
+
+        .day-col.blocked .day-checkbox {
+            border-color: #999;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .day-col.blocked .head > * { opacity: 0.4; }
     </style>
 </head>
 <body>
-    <!-- ============ INTRO: por qué 66 días (solo primera apertura) ============ -->
+    <!-- ============ MENÚ LATERAL ============ -->
+    <button class="menu-btn" onclick="toggleMenu(true)" aria-label="Menú">
+        <span></span><span></span><span></span>
+    </button>
+
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu(false)"></div>
+
+    <div class="drawer" id="drawer">
+        <div class="drawer-title">MENÚ</div>
+
+        <button class="drawer-item" onclick="setDark(!isDark)">
+            modo oscuro
+            <span class="switch" id="darkSwitch"></span>
+        </button>
+
+        <button class="drawer-item" onclick="replayIntro()">
+            ver intro de nuevo
+        </button>
+
+        <button class="drawer-item" onclick="resetChallenge()">
+            reiniciar reto
+            <span class="hint">borra todo</span>
+        </button>
+    </div>
+
+    <!-- ============ INTRO ============ -->
     <div class="intro hidden" id="intro" onclick="nextIntroPhrase()">
         <div class="intro-square"></div>
         <div class="intro-phrase" id="introPhrase"></div>
         <div class="intro-hint" id="introHint">toca para continuar</div>
-        <button class="intro-start" id="introStart" onclick="finishIntro(event)">empezar</button>
+        <button class="intro-start" id="introStart" onclick="goToSetup(event)">empezar</button>
+
+        <!-- Paso final: el usuario digita SUS 4 hábitos -->
+        <div class="setup" id="setup" onclick="event.stopPropagation()">
+            <div class="setup-sub">digita tus 4 hábitos</div>
+            <input class="setup-input" id="hab1" maxlength="18" placeholder="hábito 1" autocomplete="off">
+            <input class="setup-input" id="hab2" maxlength="18" placeholder="hábito 2" autocomplete="off">
+            <input class="setup-input" id="hab3" maxlength="18" placeholder="hábito 3" autocomplete="off">
+            <input class="setup-input" id="hab4" maxlength="18" placeholder="hábito 4" autocomplete="off">
+            <button class="setup-start" id="setupStart" onclick="startChallenge(event)">empezar</button>
+        </div>
     </div>
 
     <div class="container">
@@ -545,55 +745,23 @@
             <div class="level" data-days="66"><div class="dot"></div>66</div>
         </div>
 
-        <!-- ============ TABLERO ============ -->
+        <!-- ============ TABLERO (se genera con JS) ============ -->
         <div class="board">
-            <div class="fixed-col col-habitos-w">
-                <div class="head">HABITOS</div>
-                <div class="cell">Rezar</div>
-                <div class="cell">Entrenar</div>
-                <div class="cell last">Leer</div>
-            </div>
-
+            <div class="fixed-col col-habitos-w" id="habitsCol"></div>
             <div class="days-scroll" id="daysScroll">
                 <div class="days-track" id="daysTrack"></div>
             </div>
-
-            <div class="fixed-col col-prime-w">
-                <div class="head">PRIME</div>
-                <div class="cell" data-habit="0">
-                    <div class="percentage">0%</div>
-                    <svg class="progress-circle-svg" viewBox="0 0 44 44">
-                        <circle class="progress-circle-bg" cx="22" cy="22" r="19"></circle>
-                        <circle class="progress-circle-fill" cx="22" cy="22" r="19"></circle>
-                        <text class="progress-circle-checkmark" x="22" y="22">✓</text>
-                    </svg>
-                </div>
-                <div class="cell" data-habit="1">
-                    <div class="percentage">0%</div>
-                    <svg class="progress-circle-svg" viewBox="0 0 44 44">
-                        <circle class="progress-circle-bg" cx="22" cy="22" r="19"></circle>
-                        <circle class="progress-circle-fill" cx="22" cy="22" r="19"></circle>
-                        <text class="progress-circle-checkmark" x="22" y="22">✓</text>
-                    </svg>
-                </div>
-                <div class="cell last" data-habit="2">
-                    <div class="percentage">0%</div>
-                    <svg class="progress-circle-svg" viewBox="0 0 44 44">
-                        <circle class="progress-circle-bg" cx="22" cy="22" r="19"></circle>
-                        <circle class="progress-circle-fill" cx="22" cy="22" r="19"></circle>
-                        <text class="progress-circle-checkmark" x="22" y="22">✓</text>
-                    </svg>
-                </div>
-            </div>
+            <div class="fixed-col col-prime-w" id="primeCol"></div>
         </div>
 
         <!-- ============ AGREGAR ============ -->
         <div class="add-row">
             <button class="add-button" onclick="addHabit()" title="Agregar nuevo hábito">+</button>
-            <div class="add-label">¿este será tu límite?</div>
+            <div class="add-label" id="addLabel">¿este será tu límite?</div>
+            <div class="add-count" id="addCount"></div>
         </div>
 
-        <!-- ============ PROGRESO DIARIO ============ -->
+        <!-- ============ PROGRESO ============ -->
         <div class="progress-section">
             <div class="section-title">PROGRESO</div>
             <div class="chart-wrap">
@@ -616,44 +784,14 @@
     </div>
 
     <script>
+        'use strict';
+
         // ============ CONFIGURACIÓN ============
         const TOTAL_DAYS = 66;
         const LEVELS = [7, 15, 30, 66];
-        const HABITS = ['Rezar', 'Entrenar', 'Leer'];
-
-        // ============ PERSISTENCIA (localStorage) ============
-        // El progreso se guarda EN EL TELÉFONO: al cerrar y volver a abrir
-        // la app, los checks y el día en que vas siguen ahí.
+        const MIN_HABITS = 4;
+        const MAX_HABITS = 10;
         const STORAGE_KEY = 'miPrimeState';
-
-        let saved = null;
-        try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) {}
-
-        // Día 1 = el día en que el usuario abre la app por primera vez.
-        // A partir de ahí, el día actual se calcula solo con la fecha real.
-        const START_DATE = (saved && saved.startDate)
-            ? new Date(saved.startDate)
-            : (() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; })();
-
-        const _today = new Date(); _today.setHours(0, 0, 0, 0);
-        const _diff = Math.floor((_today - START_DATE) / 86400000);
-        const CURRENT_DAY = Math.min(Math.max(_diff + 1, 1), TOTAL_DAYS);
-
-        const checks = (saved && saved.checks)
-            ? saved.checks
-            : HABITS.map(() => Array(TOTAL_DAYS).fill(false));
-
-        function saveState() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                    startDate: START_DATE.toISOString(),
-                    checks: checks
-                }));
-            } catch (e) {}
-        }
-
-        // Primer uso: fijar la fecha de inicio de una vez
-        if (!saved) saveState();
 
         const CALENDAR_SVG =
             '<svg class="calendar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
@@ -662,20 +800,137 @@
             '<rect width="18" height="18" x="3" y="4" rx="2"/>' +
             '<path d="M3 10h18"/></svg>';
 
-        // ============ TÍTULO DINÁMICO Y RETADOR ============
-        // La frase cambia según el tramo del reto — siempre picando al usuario.
+        const LOCK_SVG =
+            '<svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+            'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<rect width="18" height="11" x="3" y="11" rx="2"/>' +
+            '<path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+
+        // ============ BLOQUES DE DESBLOQUEO ============
+        // Solo los primeros 7 días están disponibles al inicio.
+        // Cada bloque se desbloquea cumpliendo un % mínimo del anterior:
+        //   días 1-7   → siempre disponibles
+        //   días 8-15  → requiere 50% del bloque 1-7
+        //   días 16-30 → requiere 50% del bloque 8-15
+        //   días 31-66 → requiere 70% del bloque 16-30
+        const BLOCKS = [
+            { start: 1,  end: 7,  req: 0,  prev: null },
+            { start: 8,  end: 15, req: 50, prev: [1, 7] },
+            { start: 16, end: 30, req: 50, prev: [8, 15] },
+            { start: 31, end: 66, req: 70, prev: [16, 30] }
+        ];
+
+        function rangeCompliance(s, e) {
+            // % de checks cumplidos en el rango de días [s, e]
+            const habitsN = state.habits.length;
+            const total = habitsN * (e - s + 1);
+            let done = 0;
+            for (let h = 0; h < habitsN; h++) {
+                for (let d = s - 1; d < e; d++) {
+                    if (state.checks[h][d]) done++;
+                }
+            }
+            return total > 0 ? Math.round((done / total) * 100) : 0;
+        }
+
+        function blockOf(day) {
+            return BLOCKS.find(b => day >= b.start && day <= b.end);
+        }
+
+        function isBlockUnlocked(b) {
+            if (!b.prev) return true;
+            return rangeCompliance(b.prev[0], b.prev[1]) >= b.req;
+        }
+
+        function isDayBlocked(day) {
+            return !isBlockUnlocked(blockOf(day));
+        }
+
+        function unlockSignature() {
+            return BLOCKS.map(b => (isBlockUnlocked(b) ? '1' : '0')).join('');
+        }
+
+        let lastUnlockSig = '';
+
+        // Frases que rotan cada vez que se agrega un hábito (por cantidad)
+        const ADD_PHRASES = {
+            4: '¿este será tu límite?',
+            5: 'eso. uno más.',
+            6: 'así se construye disciplina',
+            7: 'tu yo del día 66 te lo va a agradecer',
+            8: 'nadie va a venir a hacerlo por ti',
+            9: 'esto ya es otro nivel',
+            10: '10 hábitos. máximo alcanzado. ahora cúmplelos.'
+        };
+
+        // ============ ALMACENAMIENTO LOCAL (versionado) ============
+        // Esquema v2: { v: 2, startDate, habits: [...], checks: [[...]] }
+        // Migra automáticamente datos de la versión anterior.
+        let state = null;
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                const s = JSON.parse(raw);
+                if (!s || !s.startDate) return null;
+
+                // Migración desde v1 (sin habits): se respetan los que existan;
+                // si no hay, el usuario los digitará en la intro
+                if (!s.habits || !Array.isArray(s.habits)) {
+                    s.habits = [];
+                }
+                if (!s.checks || !Array.isArray(s.checks)) {
+                    s.checks = s.habits.map(() => Array(TOTAL_DAYS).fill(false));
+                }
+                // Ajustar checks al número de hábitos
+                while (s.checks.length < s.habits.length) s.checks.push(Array(TOTAL_DAYS).fill(false));
+                s.checks = s.checks.slice(0, s.habits.length);
+                s.checks = s.checks.map(arr => {
+                    const a = Array.isArray(arr) ? arr.slice(0, TOTAL_DAYS) : [];
+                    while (a.length < TOTAL_DAYS) a.push(false);
+                    return a;
+                });
+                s.v = 2;
+                return s;
+            } catch (e) { return null; }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {}
+        }
+
+        state = loadState();
+        if (!state) {
+            const t = new Date(); t.setHours(0, 0, 0, 0);
+            // SIN hábitos por defecto: cada persona digita LOS SUYOS en la intro
+            state = {
+                v: 2,
+                startDate: t.toISOString(),
+                habits: [],
+                checks: []
+            };
+            saveState();
+        }
+
+        const START_DATE = new Date(state.startDate);
+        const _today = new Date(); _today.setHours(0, 0, 0, 0);
+        const _diff = Math.floor((_today - START_DATE) / 86400000);
+        const CURRENT_DAY = Math.min(Math.max(_diff + 1, 1), TOTAL_DAYS);
+
+        // ============ TÍTULO DINÁMICO (por fase del reto) ============
         function updateTitle() {
             const remaining = TOTAL_DAYS - CURRENT_DAY;
             let phrase;
 
-            if (CURRENT_DAY === 1) {
-                phrase = 'solo 66 días mas';
-            } else if (CURRENT_DAY <= 7) {
-                phrase = '¿no puedes ni con 7 días?';
+            if (CURRENT_DAY <= 7) {
+                phrase = '¿no puedes con 7 días?';
             } else if (CURRENT_DAY <= 15) {
-                phrase = 'lo fácil ya pasó';
+                phrase = '¿y con 15, podrás?';
             } else if (CURRENT_DAY <= 30) {
-                phrase = '¿te vas a rendir ahora?';
+                phrase = '30 días. ¿te vas a rendir ahora?';
             } else if (CURRENT_DAY < TOTAL_DAYS) {
                 phrase = 'ya no eres el mismo';
             } else {
@@ -687,73 +942,130 @@
                 'Día ' + CURRENT_DAY + ' de ' + TOTAL_DAYS + ' — te faltan ' + remaining + ' días';
         }
 
-        // ============ DÍAS ============
+        // ============ CONSTRUCCIÓN DEL TABLERO ============
         function formatDate(d) {
             const dd = String(d.getDate()).padStart(2, '0');
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             return dd + '/' + mm;
         }
 
+        function buildFixedCols() {
+            const habits = state.habits;
+
+            // Columna HABITOS
+            let hHtml = '<div class="head">HABITOS</div>';
+            habits.forEach((name, i) => {
+                const last = i === habits.length - 1 ? ' last' : '';
+                hHtml += '<div class="cell' + last + '">' + name + '</div>';
+            });
+            document.getElementById('habitsCol').innerHTML = hHtml;
+
+            // Columna PRIME
+            let pHtml = '<div class="head">PRIME</div>';
+            habits.forEach((_, i) => {
+                const last = i === habits.length - 1 ? ' last' : '';
+                pHtml +=
+                    '<div class="cell' + last + '" data-habit="' + i + '">' +
+                        '<div class="percentage">0%</div>' +
+                        '<svg class="progress-circle-svg" viewBox="0 0 44 44">' +
+                            '<circle class="progress-circle-bg" cx="22" cy="22" r="19"></circle>' +
+                            '<circle class="progress-circle-fill" cx="22" cy="22" r="19"></circle>' +
+                            '<text class="progress-circle-checkmark" x="22" y="22">✓</text>' +
+                        '</svg>' +
+                    '</div>';
+            });
+            document.getElementById('primeCol').innerHTML = pHtml;
+        }
+
         function buildDays() {
+            const habits = state.habits;
             const track = document.getElementById('daysTrack');
-            track.innerHTML = '';
+            const frag = document.createDocumentFragment();
 
             for (let day = 1; day <= TOTAL_DAYS; day++) {
                 const isCurrent = day === CURRENT_DAY;
+                const blocked = isDayBlocked(day);
                 const date = new Date(START_DATE);
                 date.setDate(date.getDate() + (day - 1));
 
                 const col = document.createElement('div');
-                col.className = 'day-col ' + (isCurrent ? 'current' : 'locked');
+                col.className = 'day-col ' + (isCurrent ? 'current' : 'locked') + (blocked ? ' blocked' : '');
                 col.dataset.day = day;
 
-                const head = document.createElement('div');
-                head.className = 'head';
-                head.innerHTML =
-                    '<div class="date-text">' + formatDate(date) + '</div>' +
-                    CALENDAR_SVG +
-                    '<div class="day-text">Día ' + day + '</div>';
-                col.appendChild(head);
+                let inner =
+                    '<div class="head">' +
+                        '<div class="date-text">' + formatDate(date) + '</div>' +
+                        (blocked ? LOCK_SVG : CALENDAR_SVG) +
+                        '<div class="day-text">Día ' + day + '</div>' +
+                    '</div>';
 
-                HABITS.forEach((_, h) => {
-                    const cell = document.createElement('div');
-                    cell.className = 'cell' + (h === HABITS.length - 1 ? ' last' : '');
-
-                    const cb = document.createElement('div');
-                    cb.className = 'day-checkbox' + (checks[h][day - 1] ? ' checked' : '');
-                    if (isCurrent) {
-                        cb.onclick = () => toggleCheckbox(cb, h, day - 1);
-                    }
-                    cell.appendChild(cb);
-                    col.appendChild(cell);
+                habits.forEach((_, h) => {
+                    const last = h === habits.length - 1 ? ' last' : '';
+                    const checked = state.checks[h][day - 1] ? ' checked' : '';
+                    inner +=
+                        '<div class="cell' + last + '">' +
+                            '<div class="day-checkbox' + checked + '" data-habit="' + h + '" data-day="' + (day - 1) + '"></div>' +
+                        '</div>';
                 });
 
-                track.appendChild(col);
+                col.innerHTML = inner;
+                frag.appendChild(col);
             }
+
+            track.innerHTML = '';
+            track.appendChild(frag);
         }
 
-        // ============ INTERACCIÓN ============
-        function toggleCheckbox(cb, habitIndex, dayIndex) {
-            checks[habitIndex][dayIndex] = !checks[habitIndex][dayIndex];
+        // RENDIMIENTO: un solo listener para todos los checkboxes (delegación)
+        document.getElementById('daysTrack').addEventListener('click', function (e) {
+            const cb = e.target.closest('.day-checkbox');
+            if (!cb) return;
+            const col = cb.closest('.day-col');
+            if (!col || !col.classList.contains('current')) return;
+
+            // Día actual pero en bloque no desbloqueado
+            if (col.classList.contains('blocked')) {
+                const b = blockOf(parseInt(col.dataset.day, 10));
+                alert('Bloqueado 🔒 Necesitas al menos ' + b.req + '% de cumplimiento en los días ' +
+                    b.prev[0] + ' al ' + b.prev[1] + ' para desbloquear este tramo.');
+                return;
+            }
+
+            const h = parseInt(cb.dataset.habit, 10);
+            const d = parseInt(cb.dataset.day, 10);
+
+            state.checks[h][d] = !state.checks[h][d];
             cb.classList.toggle('checked');
-            saveState(); // guardar el progreso en el teléfono
-            updateProgress(habitIndex);
-            drawChart();
+            saveState();
+            updateProgress(h);
+            scheduleChart();
             updatePrimeTotal();
-        }
 
-        // ============ PROGRESO POR HÁBITO (sobre 66 días) ============
-        function habitPercentage(habitIndex) {
-            const done = checks[habitIndex].filter(Boolean).length;
+            // ¿Se desbloqueó (o re-bloqueó) un tramo? → redibujar días
+            const sig = unlockSignature();
+            if (sig !== lastUnlockSig) {
+                lastUnlockSig = sig;
+                buildDays();
+                anchorScroll();
+            }
+        });
+
+        // ============ PROGRESO POR HÁBITO ============
+        function habitPercentage(h) {
+            let done = 0;
+            const arr = state.checks[h];
+            for (let i = 0; i < arr.length; i++) if (arr[i]) done++;
             return Math.round((done / TOTAL_DAYS) * 100);
         }
 
-        function updateProgress(habitIndex) {
-            const percentage = habitPercentage(habitIndex);
-            const primeCell = document.querySelector('.col-prime-w .cell[data-habit="' + habitIndex + '"]');
-            primeCell.querySelector('.percentage').textContent = percentage + '%';
+        function updateProgress(h) {
+            const percentage = habitPercentage(h);
+            const cell = document.querySelector('#primeCol .cell[data-habit="' + h + '"]');
+            if (!cell) return;
 
-            const fill = primeCell.querySelector('.progress-circle-fill');
+            cell.querySelector('.percentage').textContent = percentage + '%';
+
+            const fill = cell.querySelector('.progress-circle-fill');
             const circumference = 2 * Math.PI * 19;
 
             if (percentage === 0) {
@@ -766,11 +1078,23 @@
             }
         }
 
-        // ============ GRÁFICO DE PROGRESO DIARIO ============
-        // Puntos verdes grandes + línea verde delgada + relleno verde transparente.
+        // ============ GRÁFICO ============
+        // El progreso SIEMPRE arranca desde un punto fijo en 0%
+        // (esquina inferior izquierda, permanente). Desde ahí se
+        // conectan los días.
         function dailyPercentage(dayIndex) {
-            const done = HABITS.reduce((acc, _, h) => acc + (checks[h][dayIndex] ? 1 : 0), 0);
-            return Math.round((done / HABITS.length) * 100);
+            let done = 0;
+            for (let h = 0; h < state.habits.length; h++) {
+                if (state.checks[h][dayIndex]) done++;
+            }
+            return Math.round((done / state.habits.length) * 100);
+        }
+
+        let chartRaf = null;
+        function scheduleChart() {
+            // RENDIMIENTO: agrupa redibujos en un solo frame
+            if (chartRaf) return;
+            chartRaf = requestAnimationFrame(() => { chartRaf = null; drawChart(); });
         }
 
         function drawChart() {
@@ -779,46 +1103,47 @@
             const padL = 30, padR = 15, padT = 12, padB = 25;
             const plotW = W - padL - padR;
             const plotH = H - padT - padB;
+            const baseY = padT + plotH;
 
             const days = CURRENT_DAY;
-            const stepX = days > 1 ? plotW / (days - 1) : 0;
+            const stepX = plotW / days;
 
             let content = '';
 
-            // Ejes (negro fijo, 0.5px)
-            content += '<line class="chart-axis" x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + plotH) + '"/>';
-            content += '<line class="chart-axis" x1="' + padL + '" y1="' + (padT + plotH) + '" x2="' + (padL + plotW) + '" y2="' + (padT + plotH) + '"/>';
+            // Ejes
+            content += '<line class="chart-axis" x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + baseY + '"/>';
+            content += '<line class="chart-axis" x1="' + padL + '" y1="' + baseY + '" x2="' + (padL + plotW) + '" y2="' + baseY + '"/>';
 
             [0, 50, 100].forEach(v => {
-                const y = padT + plotH - (v / 100) * plotH;
+                const y = baseY - (v / 100) * plotH;
                 content += '<text class="chart-axis-label" x="' + (padL - 6) + '" y="' + (y + 2) + '" text-anchor="end">' + v + '</text>';
             });
 
-            const pts = [];
+            // PUNTO FIJO: origen permanente en (0, 0%)
+            const pts = [{ x: padL, y: baseY, label: '' }];
+
             for (let d = 0; d < days; d++) {
-                const x = days > 1 ? padL + d * stepX : padL + plotW / 2;
-                const y = padT + plotH - (dailyPercentage(d) / 100) * plotH;
-                pts.push({ x, y, day: d + 1 });
+                const x = padL + (d + 1) * stepX;
+                const y = baseY - (dailyPercentage(d) / 100) * plotH;
+                pts.push({ x, y, label: 'D' + (d + 1) });
             }
 
-            // 1) Área bajo la línea: relleno verde TRANSPARENTE (cerrado hasta el eje X)
-            if (pts.length > 1) {
-                let areaPath = 'M' + pts[0].x + ' ' + (padT + plotH);
-                pts.forEach(p => { areaPath += ' L' + p.x + ' ' + p.y; });
-                areaPath += ' L' + pts[pts.length - 1].x + ' ' + (padT + plotH) + ' Z';
-                content += '<path class="chart-area" d="' + areaPath + '"/>';
-            }
+            // Área (verde transparente) cerrada hasta el eje
+            let areaPath = 'M' + pts[0].x + ' ' + baseY;
+            pts.forEach(p => { areaPath += ' L' + p.x + ' ' + p.y; });
+            areaPath += ' L' + pts[pts.length - 1].x + ' ' + baseY + ' Z';
+            content += '<path class="chart-area" d="' + areaPath + '"/>';
 
-            // 2) Línea conectora VERDE (más delgada que los puntos)
-            if (pts.length > 1) {
-                const linePath = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x + ' ' + p.y).join(' ');
-                content += '<path class="chart-line" d="' + linePath + '"/>';
-            }
+            // Línea verde
+            const linePath = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x + ' ' + p.y).join(' ');
+            content += '<path class="chart-line" d="' + linePath + '"/>';
 
-            // 3) Puntos verdes grandes + etiquetas de día
+            // Puntos verdes + etiquetas
             pts.forEach(p => {
                 content += '<circle class="chart-dot" cx="' + p.x + '" cy="' + p.y + '" r="5"/>';
-                content += '<text class="chart-axis-label" x="' + p.x + '" y="' + (padT + plotH + 14) + '" text-anchor="middle">D' + p.day + '</text>';
+                if (p.label) {
+                    content += '<text class="chart-axis-label" x="' + p.x + '" y="' + (baseY + 14) + '" text-anchor="middle">' + p.label + '</text>';
+                }
             });
 
             svg.innerHTML = content;
@@ -826,9 +1151,10 @@
 
         // ============ PRIME TOTAL ============
         function updatePrimeTotal() {
-            const avg = Math.round(
-                HABITS.reduce((acc, _, h) => acc + habitPercentage(h), 0) / HABITS.length
-            );
+            const n = state.habits.length;
+            let sum = 0;
+            for (let h = 0; h < n; h++) sum += habitPercentage(h);
+            const avg = Math.round(sum / n);
 
             document.getElementById('pgNumber').textContent = avg + '%';
 
@@ -844,6 +1170,29 @@
             }
         }
 
+        // ============ AGREGAR HÁBITO (mín 4, máx 10) ============
+        function updateAddLabel() {
+            const n = state.habits.length;
+            document.getElementById('addLabel').textContent = ADD_PHRASES[n] || ADD_PHRASES[4];
+            document.getElementById('addCount').textContent = n + ' de ' + MAX_HABITS + ' hábitos';
+        }
+
+        function addHabit() {
+            if (state.habits.length >= MAX_HABITS) {
+                alert('Máximo ' + MAX_HABITS + ' hábitos. Enfócate en cumplir los que ya tienes.');
+                return;
+            }
+
+            const name = prompt('Nombre del nuevo hábito:');
+            if (!name || !name.trim()) return;
+
+            state.habits.push(name.trim().slice(0, 18));
+            state.checks.push(Array(TOTAL_DAYS).fill(false));
+            saveState();
+
+            buildBoard();
+        }
+
         // ============ NIVELES ============
         function updateLevels() {
             document.querySelectorAll('.level').forEach(level => {
@@ -852,29 +1201,30 @@
             });
         }
 
-        function addHabit() {
-            alert('Agregar nuevo hábito - Funcionalidad próximamente');
+        // ============ ANCLA DEL SCROLL ============
+        function anchorScroll() {
+            const scroll = document.getElementById('daysScroll');
+            const track = document.getElementById('daysTrack');
+            if (CURRENT_DAY > 1) {
+                const prevCol = track.querySelector('.day-col[data-day="' + (CURRENT_DAY - 1) + '"]');
+                if (prevCol) scroll.scrollLeft = prevCol.offsetLeft;
+            } else {
+                scroll.scrollLeft = 0;
+            }
         }
 
-        // ============ INICIALIZAR ============
-        updateTitle();
-        buildDays();
-        HABITS.forEach((_, h) => updateProgress(h));
-        updateLevels();
-        drawChart();
-        updatePrimeTotal();
-
-        const scroll = document.getElementById('daysScroll');
-        const track = document.getElementById('daysTrack');
-        if (CURRENT_DAY > 1) {
-            const prevCol = track.querySelector('.day-col[data-day="' + (CURRENT_DAY - 1) + '"]');
-            if (prevCol) scroll.scrollLeft = prevCol.offsetLeft;
-        } else {
-            scroll.scrollLeft = 0;
+        // ============ CONSTRUIR / REFRESCAR TODO ============
+        function buildBoard() {
+            buildFixedCols();
+            buildDays();
+            for (let h = 0; h < state.habits.length; h++) updateProgress(h);
+            scheduleChart();
+            updatePrimeTotal();
+            updateAddLabel();
+            anchorScroll();
         }
 
-        // ============ INTRO: por qué 66 días ============
-        // Se muestra solo la primera vez que se abre la app.
+        // ============ INTRO ============
         const INTRO_PHRASES = [
             'hola',
             'ya estás aquí',
@@ -895,6 +1245,8 @@
         }
 
         function nextIntroPhrase() {
+            // Si ya está en el paso de digitar hábitos, no avanzar frases
+            if (document.getElementById('setup').classList.contains('visible')) return;
             if (introIndex >= INTRO_PHRASES.length - 1) return;
 
             const el = document.getElementById('introPhrase');
@@ -905,12 +1257,60 @@
                 el.textContent = INTRO_PHRASES[introIndex];
                 el.classList.remove('fading');
 
-                // Última frase: mostrar el botón "empezar"
                 if (introIndex === INTRO_PHRASES.length - 1) {
                     document.getElementById('introHint').style.display = 'none';
                     document.getElementById('introStart').classList.add('visible');
                 }
             }, 250);
+        }
+
+        // ============ PASO: DIGITA TUS 4 HÁBITOS ============
+        function goToSetup(e) {
+            e.stopPropagation();
+
+            // Usuario que ya tiene hábitos (vio el intro de nuevo): entrar directo
+            if (state.habits.length >= MIN_HABITS) {
+                finishIntro(e);
+                return;
+            }
+
+            document.getElementById('introStart').classList.remove('visible');
+            document.getElementById('introPhrase').textContent = 'empecemos con 4';
+            document.getElementById('setup').classList.add('visible');
+            document.getElementById('hab1').focus();
+        }
+
+        function checkSetupReady() {
+            const filled = ['hab1', 'hab2', 'hab3', 'hab4'].every(id =>
+                document.getElementById(id).value.trim().length > 0
+            );
+            document.getElementById('setupStart').classList.toggle('ready', filled);
+        }
+
+        ['hab1', 'hab2', 'hab3', 'hab4'].forEach(id => {
+            document.getElementById(id).addEventListener('input', checkSetupReady);
+        });
+
+        function startChallenge(e) {
+            e.stopPropagation();
+
+            const names = ['hab1', 'hab2', 'hab3', 'hab4']
+                .map(id => document.getElementById(id).value.trim().slice(0, 18))
+                .filter(n => n.length > 0);
+
+            if (names.length < MIN_HABITS) return;
+
+            state.habits = names;
+            state.checks = names.map(() => Array(TOTAL_DAYS).fill(false));
+
+            // El reto arranca oficialmente HOY, al digitar los hábitos
+            const t = new Date(); t.setHours(0, 0, 0, 0);
+            state.startDate = t.toISOString();
+            saveState();
+
+            try { localStorage.setItem('miPrimeIntroSeen', '1'); } catch (err) {}
+            document.getElementById('intro').classList.add('hidden');
+            location.reload();
         }
 
         function finishIntro(e) {
@@ -919,12 +1319,60 @@
             document.getElementById('intro').classList.add('hidden');
         }
 
-        // Mostrar el intro solo si nunca se ha visto
+        // ============ MENÚ LATERAL ============
+        function toggleMenu(open) {
+            document.getElementById('drawer').classList.toggle('open', open);
+            document.getElementById('menuOverlay').classList.toggle('open', open);
+        }
+
+        // ============ MODO OSCURO ============
+        let isDark = false;
+        try { isDark = localStorage.getItem('miPrimeDark') === '1'; } catch (e) {}
+
+        function applyDark() {
+            document.documentElement.classList.toggle('dark', isDark);
+            document.getElementById('darkSwitch').classList.toggle('on', isDark);
+        }
+
+        function setDark(on) {
+            isDark = on;
+            try { localStorage.setItem('miPrimeDark', on ? '1' : '0'); } catch (e) {}
+            applyDark();
+        }
+
+        // ============ VER INTRO DE NUEVO ============
+        function replayIntro() {
+            toggleMenu(false);
+            introIndex = 0;
+            document.getElementById('setup').classList.remove('visible');
+            document.getElementById('introHint').style.display = '';
+            document.getElementById('introStart').classList.remove('visible');
+            showIntro();
+        }
+
+        // ============ REINICIAR RETO ============
+        function resetChallenge() {
+            if (!confirm('Esto borra TODO tu progreso y el reto empieza de cero. ¿Seguro?')) return;
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem('miPrimeIntroSeen');
+            } catch (e) {}
+            location.reload();
+        }
+
+        // ============ INICIALIZAR ============
+        updateTitle();
+        updateLevels();
+        lastUnlockSig = unlockSignature();
+        buildBoard();
+        applyDark();
+
         let introSeen = false;
         try { introSeen = localStorage.getItem('miPrimeIntroSeen') === '1'; } catch (e) {}
-        if (!introSeen) showIntro();
+        // Se muestra si nunca vio el intro O si aún no ha digitado sus 4 hábitos
+        if (!introSeen || state.habits.length < MIN_HABITS) showIntro();
 
-        // ============ PWA: registrar service worker ============
+        // ============ PWA ============
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
