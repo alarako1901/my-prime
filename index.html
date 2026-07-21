@@ -669,6 +669,174 @@
 
         .modal-btn.ghost { border-color: #999; color: #999; }
 
+        /* ============ MENSAJE DEL DÍA / CELEBRACIONES ============ */
+        .flash {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 95;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .flash.hidden { display: none; }
+
+        .flash-day {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 25px;
+        }
+
+        .flash-text {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.35;
+            max-width: 320px;
+        }
+
+        .flash-hint {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 11px;
+            color: #999;
+            margin-top: 40px;
+        }
+
+        .flash-btn {
+            margin-top: 40px;
+            padding: 14px 40px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 30px;
+            background: white;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        /* ============ PRIME POR PILAR (4 círculos pequeños) ============ */
+        .pillars-row {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            margin-top: 6px;
+        }
+
+        .pillar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pillar-wrap { position: relative; width: 44px; height: 44px; }
+
+        .pillar-svg { width: 44px; height: 44px; }
+
+        .pp-bg { fill: none; stroke: #e0e0e0; stroke-width: 2.5; }
+
+        .pp-fill {
+            fill: none;
+            stroke: #00d084;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-dasharray: 100.53; /* 2π×16 */
+            stroke-dashoffset: 100.53;
+            transform-origin: 20px 20px;
+            transform: rotate(-90deg);
+            transition: stroke-dashoffset 0.3s ease;
+            opacity: 0;
+        }
+
+        .pp-fill.visible { opacity: 1; }
+
+        .pillar-icon-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a1a;
+        }
+
+        .pillar-icon-center svg { width: 16px; height: 16px; }
+
+        .pillar-item.empty .pillar-icon-center { color: #ccc; }
+
+        .pillar-pct {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .pillar-item.empty .pillar-pct { color: #ccc; }
+
+        /* ============ SELECTOR DE PILAR (modal) ============ */
+        .pillar-select {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .pillar-opt {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 4px;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1a1a1a;
+            cursor: pointer;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .pillar-opt svg { width: 18px; height: 18px; }
+
+        .pillar-opt.selected { background: #1a1a1a; color: #ffffff; }
+
+        /* ============ SUGERENCIAS DE HÁBITOS (chips) ============ */
+        .sugg-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .sugg-chip {
+            padding: 7px 12px;
+            border: 1.5px solid #1a1a1a;
+            border-radius: 16px;
+            background: #ffffff;
+            color: #1a1a1a;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .sugg-chip:active { background: #1a1a1a; color: #fff; }
+
+        .sugg-note {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 9px;
+            color: #999;
+            text-align: center;
+        }
+
         /* ============ MENÚ LATERAL (hamburguesa) ============ */
         .menu-btn {
             position: fixed;
@@ -792,6 +960,14 @@
     </style>
 </head>
 <body>
+    <!-- ============ MENSAJE DEL DÍA / CELEBRACIONES / FIN ============ -->
+    <div class="flash hidden" id="flash">
+        <div class="flash-day" id="flashDay"></div>
+        <div class="flash-text" id="flashText"></div>
+        <div class="flash-hint" id="flashHint">toca para continuar</div>
+        <button class="flash-btn" id="flashBtn" style="display:none" onclick="restartAll(event)">empezar de nuevo</button>
+    </div>
+
     <!-- ============ MENÚ LATERAL ============ -->
     <button class="menu-btn" onclick="toggleMenu(true)" aria-label="Menú">
         <span></span><span></span><span></span>
@@ -851,6 +1027,9 @@
     <div class="modal-overlay hidden" id="habitModal" onclick="closeHabitModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <div class="modal-title">nuevo hábito</div>
+            <div class="pillar-select" id="modalPillars"></div>
+            <div class="sugg-note" id="suggNote"></div>
+            <div class="sugg-wrap" id="modalSuggs"></div>
             <div class="icon-grid" id="modalIconGrid"></div>
             <input class="setup-input" id="modalHabitName" maxlength="18" placeholder="nombre del hábito" autocomplete="off">
             <div class="modal-actions">
@@ -922,6 +1101,7 @@
                 <div class="prime-general-number" id="pgNumber">0%</div>
             </div>
             <div class="prime-general-caption">lo que construyes cada día, nadie te lo quita</div>
+            <div class="pillars-row" id="pillarsRow"></div>
         </div>
     </div>
 
@@ -992,6 +1172,173 @@
                 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                 inner + '</svg>';
         }
+
+        // ============ LOS 4 PILARES ============
+        // físico = músculo · mente = cerebro · corazón = corazón · alma = palomita
+        const PILLARS = {
+            cuerpo: {
+                name: 'FÍSICO',
+                icon: '<path d="M12.409 13.017A5 5 0 0 1 22 15c0 3.866-4 7-9 7-4.077 0-8.153-.82-10.371-2.462-.426-.316-.631-.832-.62-1.362C2.118 12.723 2.627 2 10 2a3 3 0 0 1 3 3 2 2 0 0 1-2 2c-1.105 0-1.64-.444-2-1"/>'
+            },
+            mente: {
+                name: 'MENTAL',
+                icon: '<path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0-1.32 4.24 3 3 0 0 0 .34 5.58 2.5 2.5 0 0 0 2.96 3.08A2.5 2.5 0 0 0 12 19.5Z"/><path d="M12 4.5a2.5 2.5 0 0 1 4.96-.46 2.5 2.5 0 0 1 1.98 3 2.5 2.5 0 0 1 1.32 4.24 3 3 0 0 1-.34 5.58 2.5 2.5 0 0 1-2.96 3.08A2.5 2.5 0 0 1 12 19.5Z"/>'
+            },
+            corazon: {
+                name: 'CORAZÓN',
+                icon: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>'
+            },
+            alma: {
+                name: 'ALMA',
+                icon: '<path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/><path d="M10 18v3"/><path d="M14 17.75V21"/><path d="M7 18a6 6 0 0 0 3.84-10.61"/>'
+            }
+        };
+
+        const PILLAR_IDS = ['cuerpo', 'mente', 'corazon', 'alma'];
+
+        function pillarSvg(pid, cls) {
+            return '<svg class="' + cls + '" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+                'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                PILLARS[pid].icon + '</svg>';
+        }
+
+        // ============ SUGERENCIAS: 10 HÁBITOS POR PILAR ============
+        const SUGGESTIONS = {
+            cuerpo: [
+                { n: 'Entrenar', i: 'dumbbell' }, { n: 'Dormir bien', i: 'moon' },
+                { n: 'Tomar agua', i: 'droplet' }, { n: 'Despertar temprano', i: 'sun' },
+                { n: 'Ducha fría', i: 'snowflake' }, { n: 'Comer sano', i: 'apple' },
+                { n: 'Caminar 30 min', i: 'activity' }, { n: 'Estirar', i: 'activity' },
+                { n: 'Sin azúcar', i: 'apple' }, { n: '10 mil pasos', i: 'activity' }
+            ],
+            mente: [
+                { n: 'Leer', i: 'book' }, { n: 'Escuchar música', i: 'music' },
+                { n: 'Reflexionar', i: 'wind' }, { n: 'Escribir', i: 'pencil' },
+                { n: 'Sin scrolling', i: 'phone' }, { n: 'Estudiar', i: 'cap' },
+                { n: 'Aprender algo nuevo', i: 'cap' }, { n: 'Planear el día', i: 'clock' },
+                { n: 'Enfoque profundo', i: 'target' }, { n: 'Practicar un arte', i: 'music' }
+            ],
+            corazon: [
+                { n: 'Llamar a mamá', i: 'heart' }, { n: 'Jugar con amigos', i: 'heart' },
+                { n: 'Deporte con amigos', i: 'activity' }, { n: 'Tiempo en familia', i: 'home' },
+                { n: 'Escribir a un amigo', i: 'pencil' }, { n: 'Compartir un café', i: 'coffee' },
+                { n: 'Cocinar para alguien', i: 'home' }, { n: 'Agradecer a alguien', i: 'heart' },
+                { n: 'Estar presente', i: 'phone' }, { n: 'Ayudar en casa', i: 'home' }
+            ],
+            alma: [
+                { n: 'Orar', i: 'zap' }, { n: 'Leer la Biblia', i: 'book' },
+                { n: 'Un acto bueno al día', i: 'heart' }, { n: 'Misa dominical', i: 'home' },
+                { n: 'Gratitud', i: 'heart' }, { n: 'Silencio 10 min', i: 'wind' },
+                { n: 'Perdonar', i: 'heart' }, { n: 'Servir a alguien', i: 'heart' },
+                { n: 'Reflexión nocturna', i: 'moon' }, { n: 'Meditar', i: 'wind' }
+            ]
+        };
+
+        // ============ BASE DE MENSAJES DEL DÍA ============
+        // Selección: fase del libro × rendimiento de ayer.
+        // Fase 1 = Destrucción (1-22) · Fase 2 = Implementación (23-44) · Fase 3 = Integración (45-66)
+        const MESSAGES = {
+            p1: {
+                fail: [
+                    'ayer perdiste el día. hoy no.',
+                    'un día en blanco. ¿así quieres ser recordado?',
+                    'ayer ganó tu versión débil. hoy le toca perder.',
+                    'nadie va a venir a rescatarte. márcalo tú.',
+                    'perdiste ayer. si pierdes hoy, ya es decisión.'
+                ],
+                low: [
+                    'a medias no se destruye nada. ve con todo.',
+                    'ayer hiciste lo mínimo. lo mínimo no te cambia.',
+                    'estás en la fase de destrucción. destruye la pereza primero.',
+                    'la mitad del camino es donde te rendiste antes.',
+                    'te falta hambre. búscala hoy.'
+                ],
+                good: [
+                    'vas rompiendo lo viejo. no aflojes ahora.',
+                    'la destrucción duele. por eso funciona.',
+                    'ayer cumpliste. hoy demuestra que no fue suerte.',
+                    'tu versión antigua está incómoda. perfecto.',
+                    'sigue así y los primeros 7 caen solos.'
+                ],
+                perfect: [
+                    'día perfecto. la destrucción ya empezó.',
+                    '100%. así se le habla al espejo.',
+                    'ayer no negociaste contigo. eso es poder.',
+                    'perfecto ayer. lo difícil es repetirlo hoy. hazlo.',
+                    'cero excusas ayer. que hoy tampoco encuentren espacio.'
+                ]
+            },
+            p2: {
+                fail: [
+                    'fase de implementación y perdiste un día. recupera el ritmo YA.',
+                    'un cero a estas alturas es traición a ti mismo.',
+                    'llegaste lejos para regalar días. hoy se paga la deuda.',
+                    'ayer te venció la pereza. hoy véncela tú.',
+                    'el que llega a la mitad y afloja, nunca sabe de lo que era capaz.'
+                ],
+                low: [
+                    'ya no eres nuevo en esto. exígete como veterano.',
+                    'implementar es repetir aunque aburra. repite.',
+                    'a medias ya no te queda. tú ya probaste el 100.',
+                    'la rutina te está probando. gánale.',
+                    'no llegaste hasta aquí para hacer lo mínimo.'
+                ],
+                good: [
+                    'el hábito ya se está escribiendo en ti. sigue grabándolo.',
+                    'esto ya no es motivación. es disciplina. y la tienes.',
+                    'cada check de hoy es un ladrillo que nadie te quita.',
+                    'vas bien. y bien todavía no es tu techo.',
+                    'la mitad del reto quedó atrás. adelante solo hay versión nueva.'
+                ],
+                perfect: [
+                    'perfecto otra vez. esto ya es identidad.',
+                    '100% en implementación. estás construyendo en serio.',
+                    'los días perfectos se están volviendo tu normal.',
+                    'ayer: impecable. hoy: repítelo sin pensar.',
+                    'así se ve alguien que decidió no volver atrás.'
+                ]
+            },
+            p3: {
+                fail: [
+                    'tan cerca del final y regalas un día. NO de nuevo.',
+                    'la integración se rompe con ceros. ayer fue el último.',
+                    'no llegaste hasta aquí para caerte en la meta.',
+                    'un día perdido en la recta final pesa doble. levántate.',
+                    'tu yo del día 1 estaría furioso. respóndele hoy.'
+                ],
+                low: [
+                    'la recta final no perdona medias tintas.',
+                    'estás a días de que sea automático. no lo sueltes.',
+                    'integrar es no fallar cuando ya nadie te mira.',
+                    'el final define la historia. escríbelo completo.',
+                    'lo que hagas estos días es lo que quedará para siempre.'
+                ],
+                good: [
+                    'ya casi es parte de ti. termina el trabajo.',
+                    'la meta se ve. corre hacia ella, no camines.',
+                    'estos son los días que separan a los que terminan.',
+                    'tu constancia ya habla por ti. que grite en el final.',
+                    'falta poco. y poco es donde muchos se pierden. tú no.'
+                ],
+                perfect: [
+                    'perfecto en la recta final. esto ya eres tú.',
+                    '100%. el hábito ya no te cuesta: te define.',
+                    'estás integrando como un maestro. remata.',
+                    'días perfectos al final: así se cierra un reto.',
+                    'ya no eres el mismo del día 1. y se nota.'
+                ]
+            },
+            welcome: [
+                'día 1. hoy empieza todo.',
+                'bienvenido al día 1. las excusas se quedaron afuera.',
+                'hoy no necesitas motivación. necesitas empezar.'
+            ],
+            rewards: {
+                7: '7 días. lo lograste. te mereces salir con alguien que quieres.',
+                15: '15 días. medio mes venciéndote. date un respiro, te lo ganaste.',
+                30: '30 días. un mes entero. celebra con los tuyos: esto ya es serio.'
+            }
+        };
 
         // ============ BLOQUES DE DESBLOQUEO ============
         // Solo los primeros 7 días están disponibles al inicio.
@@ -1073,6 +1420,14 @@
                 }
                 while (s.icons.length < s.habits.length) s.icons.push('zap');
                 s.icons = s.icons.slice(0, s.habits.length);
+                // Pilar por hábito (nuevo): por defecto en orden cuerpo/mente/corazón/alma
+                if (!s.pillars || !Array.isArray(s.pillars)) {
+                    s.pillars = s.habits.map((_, i) => PILLAR_IDS[i % 4]);
+                }
+                while (s.pillars.length < s.habits.length) s.pillars.push('cuerpo');
+                s.pillars = s.pillars.slice(0, s.habits.length);
+                if (!s.celebrated || !Array.isArray(s.celebrated)) s.celebrated = [];
+                if (typeof s.lastFlash !== 'string') s.lastFlash = '';
                 if (!s.checks || !Array.isArray(s.checks)) {
                     s.checks = s.habits.map(() => Array(TOTAL_DAYS).fill(false));
                 }
@@ -1104,7 +1459,10 @@
                 startDate: t.toISOString(),
                 habits: [],
                 icons: [],
-                checks: []
+                pillars: [],
+                checks: [],
+                celebrated: [],
+                lastFlash: ''
             };
             saveState();
         }
@@ -1359,7 +1717,7 @@
             const n = state.habits.length;
             let sum = 0;
             for (let h = 0; h < n; h++) sum += habitPercentage(h);
-            const avg = Math.round(sum / n);
+            const avg = n > 0 ? Math.round(sum / n) : 0;
 
             document.getElementById('pgNumber').textContent = avg + '%';
 
@@ -1373,6 +1731,37 @@
                 fill.classList.add('visible');
                 fill.style.strokeDashoffset = circumference - (avg / 100) * circumference;
             }
+
+            updatePillarPrimes();
+        }
+
+        // ============ PRIME POR PILAR (4 círculos pequeños) ============
+        function pillarPercentage(pid) {
+            const idxs = [];
+            state.pillars.forEach((p, i) => { if (p === pid) idxs.push(i); });
+            if (idxs.length === 0) return null; // sin hábitos de este pilar
+            let sum = 0;
+            idxs.forEach(i => { sum += habitPercentage(i); });
+            return Math.round(sum / idxs.length);
+        }
+
+        function updatePillarPrimes() {
+            const circ = 2 * Math.PI * 16;
+            document.getElementById('pillarsRow').innerHTML = PILLAR_IDS.map(pid => {
+                const pct = pillarPercentage(pid);
+                const empty = pct === null;
+                const offset = (empty || pct === 0) ? circ : circ - (pct / 100) * circ;
+                return '<div class="pillar-item' + (empty ? ' empty' : '') + '">' +
+                    '<div class="pillar-wrap">' +
+                        '<svg class="pillar-svg" viewBox="0 0 40 40">' +
+                            '<circle class="pp-bg" cx="20" cy="20" r="16"></circle>' +
+                            '<circle class="pp-fill' + (!empty && pct > 0 ? ' visible' : '') + '" cx="20" cy="20" r="16" style="stroke-dashoffset:' + offset + '"></circle>' +
+                        '</svg>' +
+                        '<div class="pillar-icon-center">' + pillarSvg(pid, '') + '</div>' +
+                    '</div>' +
+                    '<div class="pillar-pct">' + (empty ? '—' : pct + '%') + '</div>' +
+                '</div>';
+            }).join('');
         }
 
         // ============ AGREGAR HÁBITO (mín 4, máx 10) ============
@@ -1382,8 +1771,44 @@
             document.getElementById('addCount').textContent = n + ' de ' + MAX_HABITS + ' hábitos';
         }
 
-        // ============ AGREGAR HÁBITO: modal con el diseño de la app ============
+        // ============ AGREGAR HÁBITO: modal con pilar + sugerencias ============
         let modalIcon = 'zap';
+        let modalPillar = 'cuerpo';
+
+        function missingPillars() {
+            return PILLAR_IDS.filter(p => !state.pillars.includes(p));
+        }
+
+        function renderModalPillars() {
+            document.getElementById('modalPillars').innerHTML = PILLAR_IDS.map(pid =>
+                '<button class="pillar-opt' + (pid === modalPillar ? ' selected' : '') + '" data-pillar="' + pid + '">' +
+                    pillarSvg(pid, '') + PILLARS[pid].name +
+                '</button>'
+            ).join('');
+        }
+
+        function renderModalSuggs() {
+            const missing = missingPillars();
+            const note = document.getElementById('suggNote');
+            note.textContent = missing.includes(modalPillar)
+                ? 'te falta un hábito de ' + PILLARS[modalPillar].name.toLowerCase() + ' — buen momento'
+                : 'sugerencias de ' + PILLARS[modalPillar].name.toLowerCase() + ' (o escribe el tuyo)';
+
+            const taken = state.habits.map(h => h.toLowerCase());
+            document.getElementById('modalSuggs').innerHTML = SUGGESTIONS[modalPillar]
+                .filter(s => !taken.includes(s.n.toLowerCase()))
+                .slice(0, 6)
+                .map(s => '<button class="sugg-chip" data-name="' + s.n + '" data-icon="' + s.i + '">' + s.n + '</button>')
+                .join('');
+        }
+
+        function renderModalIcons() {
+            document.getElementById('modalIconGrid').innerHTML = ICON_IDS.map(id =>
+                '<button class="icon-opt' + (id === modalIcon ? ' selected' : '') + '" data-icon="' + id + '">' +
+                    iconSvg(id, '') +
+                '</button>'
+            ).join('');
+        }
 
         function addHabit() {
             if (state.habits.length >= MAX_HABITS) {
@@ -1392,17 +1817,33 @@
             }
 
             modalIcon = 'zap';
-            const grid = document.getElementById('modalIconGrid');
-            grid.innerHTML = ICON_IDS.map(id =>
-                '<button class="icon-opt' + (id === modalIcon ? ' selected' : '') + '" data-icon="' + id + '">' +
-                    iconSvg(id, '') +
-                '</button>'
-            ).join('');
+            // Preseleccionar el pilar que le falta al usuario (balance)
+            const missing = missingPillars();
+            modalPillar = missing.length ? missing[0] : 'cuerpo';
+
+            renderModalPillars();
+            renderModalSuggs();
+            renderModalIcons();
 
             document.getElementById('modalHabitName').value = '';
             document.getElementById('habitModal').classList.remove('hidden');
-            document.getElementById('modalHabitName').focus();
         }
+
+        document.getElementById('modalPillars').addEventListener('click', function (e) {
+            const btn = e.target.closest('.pillar-opt');
+            if (!btn) return;
+            modalPillar = btn.dataset.pillar;
+            renderModalPillars();
+            renderModalSuggs();
+        });
+
+        document.getElementById('modalSuggs').addEventListener('click', function (e) {
+            const chip = e.target.closest('.sugg-chip');
+            if (!chip) return;
+            document.getElementById('modalHabitName').value = chip.dataset.name;
+            modalIcon = chip.dataset.icon;
+            renderModalIcons();
+        });
 
         document.getElementById('modalIconGrid').addEventListener('click', function (e) {
             const btn = e.target.closest('.icon-opt');
@@ -1423,6 +1864,7 @@
 
             state.habits.push(name);
             state.icons.push(modalIcon);
+            state.pillars.push(modalPillar);
             state.checks.push(Array(TOTAL_DAYS).fill(false));
             saveState();
 
@@ -1594,6 +2036,9 @@
 
             state.habits = names;
             state.icons = setupIcons.slice(0, names.length);
+            // Los 4 iniciales se anclan a los 4 pilares en orden:
+            // cuerpo, mente, corazón, alma
+            state.pillars = PILLAR_IDS.slice(0, names.length);
             state.checks = names.map(() => Array(TOTAL_DAYS).fill(false));
 
             // El reto arranca oficialmente HOY, al digitar los hábitos
@@ -1653,6 +2098,75 @@
             location.reload();
         }
 
+        // ============ MENSAJE DEL DÍA / CELEBRACIONES / FIN ============
+        const rawDay = _diff + 1;
+
+        function todayKey() {
+            const t = new Date();
+            return t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate();
+        }
+
+        function showFlash(dayLabel, text, isFinal) {
+            document.getElementById('flashDay').textContent = dayLabel;
+            document.getElementById('flashText').textContent = text;
+            document.getElementById('flashHint').style.display = isFinal ? 'none' : '';
+            document.getElementById('flashBtn').style.display = isFinal ? 'block' : 'none';
+            document.getElementById('flash').classList.remove('hidden');
+        }
+
+        document.getElementById('flash').addEventListener('pointerdown', function (e) {
+            if (e.target.closest('button')) return;
+            // El fin del reto solo se cierra con el botón
+            if (document.getElementById('flashBtn').style.display === 'block') return;
+            this.classList.add('hidden');
+        });
+
+        function pickDailyMessage() {
+            if (CURRENT_DAY === 1) {
+                return MESSAGES.welcome[rawDay % MESSAGES.welcome.length];
+            }
+            const phase = CURRENT_DAY <= 22 ? 'p1' : (CURRENT_DAY <= 44 ? 'p2' : 'p3');
+            const yPct = dailyPercentage(CURRENT_DAY - 2); // rendimiento de AYER
+            const tier = yPct === 0 ? 'fail' : (yPct < 50 ? 'low' : (yPct < 100 ? 'good' : 'perfect'));
+            const pool = MESSAGES[phase][tier];
+            return pool[CURRENT_DAY % pool.length]; // determinístico por día
+        }
+
+        function maybeShowFlash() {
+            // 1) ¿Reto completado? (los 66 días ya pasaron)
+            if (rawDay > TOTAL_DAYS) {
+                showFlash('66 de 66', 'lo lograste. 66 días. este hábito ya es tuyo. ¿listo para el siguiente?', true);
+                return;
+            }
+
+            // 2) ¿Celebración de nivel pendiente? (7/15/30 recién superados)
+            for (const lvl of [30, 15, 7]) {
+                if (CURRENT_DAY > lvl && !state.celebrated.includes(lvl)) {
+                    state.celebrated.push(lvl);
+                    saveState();
+                    showFlash('nivel ' + lvl + ' desbloqueado', MESSAGES.rewards[lvl]);
+                    return;
+                }
+            }
+
+            // 3) Mensaje del día (una sola vez por día)
+            const tk = todayKey();
+            if (state.lastFlash !== tk) {
+                state.lastFlash = tk;
+                saveState();
+                showFlash('día ' + CURRENT_DAY + ' de ' + TOTAL_DAYS, pickDailyMessage());
+            }
+        }
+
+        function restartAll(e) {
+            e.stopPropagation();
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem('miPrimeIntroSeen');
+            } catch (err) {}
+            location.reload(); // vuelve a "hola": intro + nuevos hábitos
+        }
+
         // ============ INICIALIZAR ============
         updateTitle();
         updateLevels();
@@ -1669,6 +2183,7 @@
             setTimeout(buildBoard, 400);
         } else {
             buildBoard();
+            maybeShowFlash(); // mensaje del día / celebración / fin del reto
         }
 
         // ============ PWA ============
