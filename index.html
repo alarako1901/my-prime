@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Prime - 66 Días</title>
+
+    <!-- PWA: instalable como app en iPhone -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="My Prime">
+    <link rel="apple-touch-icon" href="icon-180.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { width: 100%; height: 100%; }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            padding: 20px 12px;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 500px; width: 100%; margin: 0 auto; }
+
+        /* ============ HEADER ============ */
+        .header { text-align: center; margin-bottom: 20px; }
+
+        .color-square {
+            width: 100px; height: 100px;
+            background: #6fa89d;
+            margin: 0 auto 15px;
+            border-radius: 4px;
+        }
+
+        .title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+
+        .subtitle {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 11px;
+            font-weight: 400;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        /* ============ NIVELES (ARRIBA DE TODO) ============ */
+        .levels {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 25px;
+        }
+
+        .level {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 11px;
+            font-weight: 400;
+            color: #999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .level .dot {
+            width: 10px; height: 10px;
+            border: 1.5px solid #999;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .level.reached { color: #1a1a1a; font-weight: 600; }
+        .level.reached .dot {
+            background: #00d084;
+            border-color: #00d084;
+        }
+
+        .level-line {
+            width: 40px;
+            height: 0.5px;
+            background: #999;
+            margin: 0 6px;
+            margin-bottom: 16px;
+        }
+
+        /* ============ LAYOUT: HABITOS (fijo) | DÍAS (scroll) | PRIME (fijo) ============ */
+        .board {
+            display: flex;
+            width: 100%;
+            background: #ffffff;
+        }
+
+        :root {
+            --h-header: 95px;
+            --h-row: 70px;
+        }
+
+        .fixed-col {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            z-index: 2;
+        }
+
+        .col-habitos-w { width: 26%; }
+        .col-prime-w { width: 25%; }
+
+        .fixed-col .head {
+            height: var(--h-header);
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 12px;
+            border-bottom: 0.5px solid #1a1a1a;
+        }
+
+        .col-habitos-w .head {
+            justify-content: flex-start;
+            padding-left: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-right: 0.5px solid #e0e0e0;
+        }
+
+        .col-prime-w .head {
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-left: 0.5px solid #e0e0e0;
+        }
+
+        .fixed-col .cell {
+            height: var(--h-row);
+            display: flex;
+            align-items: center;
+            border-bottom: 0.5px solid #e0e0e0;
+        }
+
+        .fixed-col .cell.last { border-bottom: 0.5px solid #1a1a1a; }
+
+        .col-habitos-w .cell {
+            justify-content: flex-start;
+            padding-left: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            border-right: 0.5px solid #e0e0e0;
+        }
+
+        .col-prime-w .cell {
+            justify-content: center;
+            gap: 6px;
+            border-left: 0.5px solid #e0e0e0;
+        }
+
+        /* ============ ZONA DE DÍAS (SCROLL HORIZONTAL) ============ */
+        .days-scroll {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+        }
+
+        .days-scroll::-webkit-scrollbar { display: none; }
+        .days-scroll { scrollbar-width: none; }
+
+        .days-track { display: flex; min-width: 100%; }
+
+        .day-col {
+            flex: 0 0 33.3333%;
+            display: flex;
+            flex-direction: column;
+            border-right: 0.5px solid #e0e0e0;
+            scroll-snap-align: start;
+        }
+
+        .day-col:last-child { border-right: none; }
+
+        .day-col .head {
+            height: var(--h-header);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            padding-bottom: 12px;
+            border-bottom: 0.5px solid #1a1a1a;
+        }
+
+        .day-col .cell {
+            height: var(--h-row);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 0.5px solid #e0e0e0;
+        }
+
+        .day-col .cell.last { border-bottom: 0.5px solid #1a1a1a; }
+
+        /* IMPORTANTE: las LÍNEAS nunca pierden opacidad.
+           El desvanecido se aplica SOLO al contenido (header y checkbox),
+           no a la columna entera — así los bordes quedan fijos siempre. */
+        .day-col.locked .head > * { opacity: 0.4; }
+        .day-col.locked .day-checkbox { opacity: 0.4; }
+
+        /* ============ ICONO CALENDARIO (Lucide "calendar") ============ */
+        .calendar-icon { width: 30px; height: 30px; flex-shrink: 0; }
+        .day-col.locked .calendar-icon { width: 23px; height: 23px; }
+
+        .date-text {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .day-col.locked .date-text { font-size: 9px; font-weight: 300; }
+
+        .day-text {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .day-col.locked .day-text { font-size: 11px; font-weight: 400; }
+
+        /* ============ CHECKBOXES ============ */
+        .day-checkbox {
+            width: 36px; height: 36px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: all 0.2s ease;
+            color: #1a1a1a;
+            flex-shrink: 0;
+        }
+
+        .day-col.locked .day-checkbox {
+            width: 28px; height: 28px;
+            border-color: #999;
+            color: #999;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .day-checkbox.checked {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+            color: white;
+        }
+
+        .day-col.locked .day-checkbox.checked {
+            background: #999;
+            border-color: #999;
+        }
+
+        .day-checkbox::after {
+            content: '';
+            display: none;
+            width: 4px; height: 8px;
+            border: solid currentColor;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .day-checkbox.checked::after { display: block; }
+
+        /* ============ PRIME (porcentaje + círculo) ============ */
+        .percentage {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .progress-circle-svg { width: 36px; height: 36px; flex-shrink: 0; }
+
+        .progress-circle-bg { fill: none; stroke: #e0e0e0; stroke-width: 2.5; }
+
+        .progress-circle-fill {
+            fill: none;
+            stroke: #00d084;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-dasharray: 125.66;
+            stroke-dashoffset: 125.66;
+            transition: stroke-dashoffset 0.3s ease;
+            transform-origin: 22px 22px;
+            transform: rotate(-90deg);
+            opacity: 0;
+        }
+
+        .progress-circle-fill.visible { opacity: 1; }
+
+        .progress-circle-checkmark {
+            font-size: 16px;
+            font-weight: bold;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            fill: #00d084;
+            opacity: 0;
+        }
+
+        .progress-circle-fill.full ~ .progress-circle-checkmark { opacity: 1; }
+
+        /* ============ FILA AGREGAR ============ */
+        .add-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 130px;
+            padding: 20px;
+            border-bottom: 0.5px solid #1a1a1a;
+            background: #ffffff;
+        }
+
+        .add-button {
+            width: 56px; height: 56px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            transition: all 0.2s ease;
+        }
+
+        .add-button:hover { background: #f9f9f9; }
+        .add-button:active { transform: scale(0.95); }
+
+        .add-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+        }
+
+        /* ============ PROGRESO DIARIO (gráfico de puntos) ============ */
+        .progress-section { margin-top: 30px; }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+        }
+
+        .chart-wrap { width: 100%; padding: 0 10px; }
+
+        .chart-svg { width: 100%; height: 180px; }
+
+        .chart-axis { stroke: #1a1a1a; stroke-width: 0.5; }
+
+        .chart-axis-label {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 8px;
+            fill: #999;
+        }
+
+        /* Relleno bajo la línea: verde TRANSPARENTE */
+        .chart-area {
+            fill: rgba(0, 208, 132, 0.12);
+            stroke: none;
+        }
+
+        /* Línea conectora: VERDE, más delgada que el círculo */
+        .chart-line {
+            fill: none;
+            stroke: #00d084;
+            stroke-width: 1.5;
+        }
+
+        /* Puntos: círculos grandes verdes */
+        .chart-dot { fill: #00d084; }
+
+        /* ============ PRIME TOTAL ============ */
+        .prime-general {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 25px 20px;
+            border-top: 0.5px solid #1a1a1a;
+        }
+
+        .prime-general-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .prime-general-circle-wrap { position: relative; width: 110px; height: 110px; }
+
+        .prime-general-svg { width: 110px; height: 110px; }
+
+        .pg-bg { fill: none; stroke: #e0e0e0; stroke-width: 4; }
+
+        .pg-fill {
+            fill: none;
+            stroke: #00d084;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 314.16;
+            stroke-dashoffset: 314.16;
+            transition: stroke-dashoffset 0.3s ease;
+            transform-origin: 55px 55px;
+            transform: rotate(-90deg);
+            opacity: 0;
+        }
+
+        .pg-fill.visible { opacity: 1; }
+
+        .prime-general-number {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .prime-general-caption {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+        }
+
+        /* ============ INTRO (primera apertura) ============ */
+        .intro {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .intro.hidden { display: none; }
+
+        .intro-square {
+            width: 70px; height: 70px;
+            background: #6fa89d;
+            border-radius: 4px;
+            margin-bottom: 40px;
+        }
+
+        .intro-phrase {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.3;
+            max-width: 320px;
+            min-height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.25s ease;
+        }
+
+        .intro-phrase.fading { opacity: 0; }
+
+        .intro-hint {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 11px;
+            color: #999;
+            margin-top: 40px;
+        }
+
+        .intro-start {
+            margin-top: 40px;
+            padding: 14px 40px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 30px;
+            background: white;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+            cursor: pointer;
+            display: none;
+            transition: all 0.2s ease;
+        }
+
+        .intro-start:active { transform: scale(0.96); }
+        .intro-start.visible { display: block; }
+    </style>
+</head>
+<body>
+    <!-- ============ INTRO: por qué 66 días (solo primera apertura) ============ -->
+    <div class="intro hidden" id="intro" onclick="nextIntroPhrase()">
+        <div class="intro-square"></div>
+        <div class="intro-phrase" id="introPhrase"></div>
+        <div class="intro-hint" id="introHint">toca para continuar</div>
+        <button class="intro-start" id="introStart" onclick="finishIntro(event)">empezar</button>
+    </div>
+
+    <div class="container">
+        <!-- ============ HEADER ============ -->
+        <div class="header">
+            <div class="color-square"></div>
+            <h1 class="title" id="mainTitle">solo 66 días mas</h1>
+            <div class="subtitle" id="mainSubtitle"></div>
+        </div>
+
+        <!-- ============ NIVELES ============ -->
+        <div class="levels" id="levels">
+            <div class="level" data-days="7"><div class="dot"></div>7</div>
+            <div class="level-line"></div>
+            <div class="level" data-days="15"><div class="dot"></div>15</div>
+            <div class="level-line"></div>
+            <div class="level" data-days="30"><div class="dot"></div>30</div>
+            <div class="level-line"></div>
+            <div class="level" data-days="66"><div class="dot"></div>66</div>
+        </div>
+
+        <!-- ============ TABLERO ============ -->
+        <div class="board">
+            <div class="fixed-col col-habitos-w">
+                <div class="head">HABITOS</div>
+                <div class="cell">Rezar</div>
+                <div class="cell">Entrenar</div>
+                <div class="cell last">Leer</div>
+            </div>
+
+            <div class="days-scroll" id="daysScroll">
+                <div class="days-track" id="daysTrack"></div>
+            </div>
+
+            <div class="fixed-col col-prime-w">
+                <div class="head">PRIME</div>
+                <div class="cell" data-habit="0">
+                    <div class="percentage">0%</div>
+                    <svg class="progress-circle-svg" viewBox="0 0 44 44">
+                        <circle class="progress-circle-bg" cx="22" cy="22" r="19"></circle>
+                        <circle class="progress-circle-fill" cx="22" cy="22" r="19"></circle>
+                        <text class="progress-circle-checkmark" x="22" y="22">✓</text>
+                    </svg>
+                </div>
+                <div class="cell" data-habit="1">
+                    <div class="percentage">0%</div>
+                    <svg class="progress-circle-svg" viewBox="0 0 44 44">
+                        <circle class="progress-circle-bg" cx="22" cy="22" r="19"></circle>
+                        <circle class="progress-circle-fill" cx="22" cy="22" r="19"></circle>
+                        <text class="progress-circle-checkmark" x="22" y="22">✓</text>
+                    </svg>
+                </div>
+                <div class="cell last" data-habit="2">
+                    <div class="percentage">0%</div>
+                    <svg class="progress-circle-svg" viewBox="0 0 44 44">
+                        <circle class="progress-circle-bg" cx="22" cy="22" r="19"></circle>
+                        <circle class="progress-circle-fill" cx="22" cy="22" r="19"></circle>
+                        <text class="progress-circle-checkmark" x="22" y="22">✓</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ AGREGAR ============ -->
+        <div class="add-row">
+            <button class="add-button" onclick="addHabit()" title="Agregar nuevo hábito">+</button>
+            <div class="add-label">¿este será tu límite?</div>
+        </div>
+
+        <!-- ============ PROGRESO DIARIO ============ -->
+        <div class="progress-section">
+            <div class="section-title">PROGRESO</div>
+            <div class="chart-wrap">
+                <svg class="chart-svg" id="chartSvg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+        </div>
+
+        <!-- ============ PRIME TOTAL ============ -->
+        <div class="prime-general">
+            <div class="prime-general-title">PRIME TOTAL</div>
+            <div class="prime-general-circle-wrap">
+                <svg class="prime-general-svg" viewBox="0 0 110 110">
+                    <circle class="pg-bg" cx="55" cy="55" r="50"></circle>
+                    <circle class="pg-fill" id="pgFill" cx="55" cy="55" r="50"></circle>
+                </svg>
+                <div class="prime-general-number" id="pgNumber">0%</div>
+            </div>
+            <div class="prime-general-caption">lo que construyes cada día, nadie te lo quita</div>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIGURACIÓN ============
+        const TOTAL_DAYS = 66;
+        const LEVELS = [7, 15, 30, 66];
+        const HABITS = ['Rezar', 'Entrenar', 'Leer'];
+
+        // ============ PERSISTENCIA (localStorage) ============
+        // El progreso se guarda EN EL TELÉFONO: al cerrar y volver a abrir
+        // la app, los checks y el día en que vas siguen ahí.
+        const STORAGE_KEY = 'miPrimeState';
+
+        let saved = null;
+        try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) {}
+
+        // Día 1 = el día en que el usuario abre la app por primera vez.
+        // A partir de ahí, el día actual se calcula solo con la fecha real.
+        const START_DATE = (saved && saved.startDate)
+            ? new Date(saved.startDate)
+            : (() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; })();
+
+        const _today = new Date(); _today.setHours(0, 0, 0, 0);
+        const _diff = Math.floor((_today - START_DATE) / 86400000);
+        const CURRENT_DAY = Math.min(Math.max(_diff + 1, 1), TOTAL_DAYS);
+
+        const checks = (saved && saved.checks)
+            ? saved.checks
+            : HABITS.map(() => Array(TOTAL_DAYS).fill(false));
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    startDate: START_DATE.toISOString(),
+                    checks: checks
+                }));
+            } catch (e) {}
+        }
+
+        // Primer uso: fijar la fecha de inicio de una vez
+        if (!saved) saveState();
+
+        const CALENDAR_SVG =
+            '<svg class="calendar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+            'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M8 2v4"/><path d="M16 2v4"/>' +
+            '<rect width="18" height="18" x="3" y="4" rx="2"/>' +
+            '<path d="M3 10h18"/></svg>';
+
+        // ============ TÍTULO DINÁMICO Y RETADOR ============
+        // La frase cambia según el tramo del reto — siempre picando al usuario.
+        function updateTitle() {
+            const remaining = TOTAL_DAYS - CURRENT_DAY;
+            let phrase;
+
+            if (CURRENT_DAY === 1) {
+                phrase = 'solo 66 días mas';
+            } else if (CURRENT_DAY <= 7) {
+                phrase = '¿no puedes ni con 7 días?';
+            } else if (CURRENT_DAY <= 15) {
+                phrase = 'lo fácil ya pasó';
+            } else if (CURRENT_DAY <= 30) {
+                phrase = '¿te vas a rendir ahora?';
+            } else if (CURRENT_DAY < TOTAL_DAYS) {
+                phrase = 'ya no eres el mismo';
+            } else {
+                phrase = 'lo lograste';
+            }
+
+            document.getElementById('mainTitle').textContent = phrase;
+            document.getElementById('mainSubtitle').textContent =
+                'Día ' + CURRENT_DAY + ' de ' + TOTAL_DAYS + ' — te faltan ' + remaining + ' días';
+        }
+
+        // ============ DÍAS ============
+        function formatDate(d) {
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return dd + '/' + mm;
+        }
+
+        function buildDays() {
+            const track = document.getElementById('daysTrack');
+            track.innerHTML = '';
+
+            for (let day = 1; day <= TOTAL_DAYS; day++) {
+                const isCurrent = day === CURRENT_DAY;
+                const date = new Date(START_DATE);
+                date.setDate(date.getDate() + (day - 1));
+
+                const col = document.createElement('div');
+                col.className = 'day-col ' + (isCurrent ? 'current' : 'locked');
+                col.dataset.day = day;
+
+                const head = document.createElement('div');
+                head.className = 'head';
+                head.innerHTML =
+                    '<div class="date-text">' + formatDate(date) + '</div>' +
+                    CALENDAR_SVG +
+                    '<div class="day-text">Día ' + day + '</div>';
+                col.appendChild(head);
+
+                HABITS.forEach((_, h) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell' + (h === HABITS.length - 1 ? ' last' : '');
+
+                    const cb = document.createElement('div');
+                    cb.className = 'day-checkbox' + (checks[h][day - 1] ? ' checked' : '');
+                    if (isCurrent) {
+                        cb.onclick = () => toggleCheckbox(cb, h, day - 1);
+                    }
+                    cell.appendChild(cb);
+                    col.appendChild(cell);
+                });
+
+                track.appendChild(col);
+            }
+        }
+
+        // ============ INTERACCIÓN ============
+        function toggleCheckbox(cb, habitIndex, dayIndex) {
+            checks[habitIndex][dayIndex] = !checks[habitIndex][dayIndex];
+            cb.classList.toggle('checked');
+            saveState(); // guardar el progreso en el teléfono
+            updateProgress(habitIndex);
+            drawChart();
+            updatePrimeTotal();
+        }
+
+        // ============ PROGRESO POR HÁBITO (sobre 66 días) ============
+        function habitPercentage(habitIndex) {
+            const done = checks[habitIndex].filter(Boolean).length;
+            return Math.round((done / TOTAL_DAYS) * 100);
+        }
+
+        function updateProgress(habitIndex) {
+            const percentage = habitPercentage(habitIndex);
+            const primeCell = document.querySelector('.col-prime-w .cell[data-habit="' + habitIndex + '"]');
+            primeCell.querySelector('.percentage').textContent = percentage + '%';
+
+            const fill = primeCell.querySelector('.progress-circle-fill');
+            const circumference = 2 * Math.PI * 19;
+
+            if (percentage === 0) {
+                fill.classList.remove('visible', 'full');
+                fill.style.strokeDashoffset = circumference;
+            } else {
+                fill.classList.add('visible');
+                fill.style.strokeDashoffset = circumference - (percentage / 100) * circumference;
+                fill.classList.toggle('full', percentage === 100);
+            }
+        }
+
+        // ============ GRÁFICO DE PROGRESO DIARIO ============
+        // Puntos verdes grandes + línea verde delgada + relleno verde transparente.
+        function dailyPercentage(dayIndex) {
+            const done = HABITS.reduce((acc, _, h) => acc + (checks[h][dayIndex] ? 1 : 0), 0);
+            return Math.round((done / HABITS.length) * 100);
+        }
+
+        function drawChart() {
+            const svg = document.getElementById('chartSvg');
+            const W = 360, H = 180;
+            const padL = 30, padR = 15, padT = 12, padB = 25;
+            const plotW = W - padL - padR;
+            const plotH = H - padT - padB;
+
+            const days = CURRENT_DAY;
+            const stepX = days > 1 ? plotW / (days - 1) : 0;
+
+            let content = '';
+
+            // Ejes (negro fijo, 0.5px)
+            content += '<line class="chart-axis" x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + plotH) + '"/>';
+            content += '<line class="chart-axis" x1="' + padL + '" y1="' + (padT + plotH) + '" x2="' + (padL + plotW) + '" y2="' + (padT + plotH) + '"/>';
+
+            [0, 50, 100].forEach(v => {
+                const y = padT + plotH - (v / 100) * plotH;
+                content += '<text class="chart-axis-label" x="' + (padL - 6) + '" y="' + (y + 2) + '" text-anchor="end">' + v + '</text>';
+            });
+
+            const pts = [];
+            for (let d = 0; d < days; d++) {
+                const x = days > 1 ? padL + d * stepX : padL + plotW / 2;
+                const y = padT + plotH - (dailyPercentage(d) / 100) * plotH;
+                pts.push({ x, y, day: d + 1 });
+            }
+
+            // 1) Área bajo la línea: relleno verde TRANSPARENTE (cerrado hasta el eje X)
+            if (pts.length > 1) {
+                let areaPath = 'M' + pts[0].x + ' ' + (padT + plotH);
+                pts.forEach(p => { areaPath += ' L' + p.x + ' ' + p.y; });
+                areaPath += ' L' + pts[pts.length - 1].x + ' ' + (padT + plotH) + ' Z';
+                content += '<path class="chart-area" d="' + areaPath + '"/>';
+            }
+
+            // 2) Línea conectora VERDE (más delgada que los puntos)
+            if (pts.length > 1) {
+                const linePath = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x + ' ' + p.y).join(' ');
+                content += '<path class="chart-line" d="' + linePath + '"/>';
+            }
+
+            // 3) Puntos verdes grandes + etiquetas de día
+            pts.forEach(p => {
+                content += '<circle class="chart-dot" cx="' + p.x + '" cy="' + p.y + '" r="5"/>';
+                content += '<text class="chart-axis-label" x="' + p.x + '" y="' + (padT + plotH + 14) + '" text-anchor="middle">D' + p.day + '</text>';
+            });
+
+            svg.innerHTML = content;
+        }
+
+        // ============ PRIME TOTAL ============
+        function updatePrimeTotal() {
+            const avg = Math.round(
+                HABITS.reduce((acc, _, h) => acc + habitPercentage(h), 0) / HABITS.length
+            );
+
+            document.getElementById('pgNumber').textContent = avg + '%';
+
+            const fill = document.getElementById('pgFill');
+            const circumference = 2 * Math.PI * 50;
+
+            if (avg === 0) {
+                fill.classList.remove('visible');
+                fill.style.strokeDashoffset = circumference;
+            } else {
+                fill.classList.add('visible');
+                fill.style.strokeDashoffset = circumference - (avg / 100) * circumference;
+            }
+        }
+
+        // ============ NIVELES ============
+        function updateLevels() {
+            document.querySelectorAll('.level').forEach(level => {
+                const days = parseInt(level.dataset.days, 10);
+                level.classList.toggle('reached', CURRENT_DAY > days);
+            });
+        }
+
+        function addHabit() {
+            alert('Agregar nuevo hábito - Funcionalidad próximamente');
+        }
+
+        // ============ INICIALIZAR ============
+        updateTitle();
+        buildDays();
+        HABITS.forEach((_, h) => updateProgress(h));
+        updateLevels();
+        drawChart();
+        updatePrimeTotal();
+
+        const scroll = document.getElementById('daysScroll');
+        const track = document.getElementById('daysTrack');
+        if (CURRENT_DAY > 1) {
+            const prevCol = track.querySelector('.day-col[data-day="' + (CURRENT_DAY - 1) + '"]');
+            if (prevCol) scroll.scrollLeft = prevCol.offsetLeft;
+        } else {
+            scroll.scrollLeft = 0;
+        }
+
+        // ============ INTRO: por qué 66 días ============
+        // Se muestra solo la primera vez que se abre la app.
+        const INTRO_PHRASES = [
+            'hola',
+            'ya estás aquí',
+            'sí, yo también me pregunté por qué 66 días',
+            'no son 20, no son 30, no son 50. son 66.',
+            'los primeros días te va a costar mucho',
+            'después...',
+            'te va a costar no hacerlo',
+            'normalmente la mente se rinde antes que el cuerpo. por eso este reto no es físico.',
+            '¿este será tu límite?'
+        ];
+
+        let introIndex = 0;
+
+        function showIntro() {
+            document.getElementById('intro').classList.remove('hidden');
+            document.getElementById('introPhrase').textContent = INTRO_PHRASES[0];
+        }
+
+        function nextIntroPhrase() {
+            if (introIndex >= INTRO_PHRASES.length - 1) return;
+
+            const el = document.getElementById('introPhrase');
+            el.classList.add('fading');
+
+            setTimeout(() => {
+                introIndex++;
+                el.textContent = INTRO_PHRASES[introIndex];
+                el.classList.remove('fading');
+
+                // Última frase: mostrar el botón "empezar"
+                if (introIndex === INTRO_PHRASES.length - 1) {
+                    document.getElementById('introHint').style.display = 'none';
+                    document.getElementById('introStart').classList.add('visible');
+                }
+            }, 250);
+        }
+
+        function finishIntro(e) {
+            e.stopPropagation();
+            try { localStorage.setItem('miPrimeIntroSeen', '1'); } catch (err) {}
+            document.getElementById('intro').classList.add('hidden');
+        }
+
+        // Mostrar el intro solo si nunca se ha visto
+        let introSeen = false;
+        try { introSeen = localStorage.getItem('miPrimeIntroSeen') === '1'; } catch (e) {}
+        if (!introSeen) showIntro();
+
+        // ============ PWA: registrar service worker ============
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
