@@ -123,7 +123,7 @@
             font-size: 14px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            border-right: 0.5px solid #e0e0e0;
+            border-right: 0.5px solid #1a1a1a;
         }
 
         .col-prime-w .head {
@@ -131,14 +131,14 @@
             font-size: 12px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            border-left: 0.5px solid #e0e0e0;
+            border-left: 0.5px solid #1a1a1a;
         }
 
         .fixed-col .cell {
             height: var(--h-row);
             display: flex;
             align-items: center;
-            border-bottom: 0.5px solid #e0e0e0;
+            border-bottom: 0.5px solid #1a1a1a;
         }
 
         .fixed-col .cell.last { border-bottom: 0.5px solid #1a1a1a; }
@@ -149,7 +149,7 @@
             font-size: 13px;
             font-weight: 600;
             letter-spacing: -0.5px;
-            border-right: 0.5px solid #e0e0e0;
+            border-right: 0.5px solid #1a1a1a;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -158,7 +158,7 @@
         .col-prime-w .cell {
             justify-content: center;
             gap: 6px;
-            border-left: 0.5px solid #e0e0e0;
+            border-left: 0.5px solid #1a1a1a;
         }
 
         /* ============ DÍAS (SCROLL) ============ */
@@ -179,7 +179,7 @@
             flex: 0 0 33.3333%;
             display: flex;
             flex-direction: column;
-            border-right: 0.5px solid #e0e0e0;
+            border-right: 0.5px solid #1a1a1a;
             scroll-snap-align: start;
         }
 
@@ -201,7 +201,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-bottom: 0.5px solid #e0e0e0;
+            border-bottom: 0.5px solid #1a1a1a;
         }
 
         .day-col .cell.last { border-bottom: 0.5px solid #1a1a1a; }
@@ -560,6 +560,109 @@
         .setup-start.ready { opacity: 1; pointer-events: auto; }
         .setup-start:active { transform: scale(0.96); }
 
+        .setup-row { display: flex; gap: 8px; align-items: center; width: 100%; }
+        .setup-row .setup-input { flex: 1; }
+
+        .icon-chip {
+            width: 44px; height: 44px;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1a1a1a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .icon-chip svg { width: 22px; height: 22px; }
+
+        /* Candado dentro de las celdas bloqueadas (reemplaza al checkbox) */
+        .cell-lock { width: 20px; height: 20px; color: #999; opacity: 0.6; flex-shrink: 0; }
+
+        /* Ícono junto al nombre del hábito */
+        .habit-row-icon { width: 16px; height: 16px; flex-shrink: 0; }
+        .col-habitos-w .cell { gap: 6px; }
+        .habit-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* ============ MODAL (mismo diseño de la app) ============ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.hidden { display: none; }
+
+        .modal-card {
+            background: #ffffff;
+            border: 0.5px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 22px 20px;
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-align: center;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .icon-opt {
+            aspect-ratio: 1;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #1a1a1a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .icon-opt svg { width: 20px; height: 20px; }
+
+        .icon-opt.selected { background: #1a1a1a; color: #ffffff; }
+
+        .modal-actions { display: flex; gap: 10px; }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 24px;
+            background: #ffffff;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .modal-btn:active { transform: scale(0.96); }
+
+        .modal-btn.ghost { border-color: #999; color: #999; }
+
         /* ============ MENÚ LATERAL (hamburguesa) ============ */
         .menu-btn {
             position: fixed;
@@ -634,7 +737,7 @@
             cursor: pointer;
             text-align: left;
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            border-bottom: 0.5px solid #e0e0e0;
+            border-bottom: 0.5px solid #1a1a1a;
         }
 
         .drawer-item .hint {
@@ -715,14 +818,47 @@
         <div class="intro-hint" id="introHint">toca para continuar</div>
         <button class="intro-start" id="introStart" onclick="goToSetup(event)">empezar</button>
 
-        <!-- Paso final: el usuario digita SUS 4 hábitos -->
+        <!-- Paso final: el usuario digita SUS 4 hábitos con su ícono -->
         <div class="setup" id="setup" onclick="event.stopPropagation()">
             <div class="setup-sub">digita tus 4 hábitos</div>
-            <input class="setup-input" id="hab1" maxlength="18" placeholder="hábito 1" autocomplete="off">
-            <input class="setup-input" id="hab2" maxlength="18" placeholder="hábito 2" autocomplete="off">
-            <input class="setup-input" id="hab3" maxlength="18" placeholder="hábito 3" autocomplete="off">
-            <input class="setup-input" id="hab4" maxlength="18" placeholder="hábito 4" autocomplete="off">
+            <div class="setup-row">
+                <button class="icon-chip" id="chip0" onclick="openIconPicker(0)"></button>
+                <input class="setup-input" id="hab1" maxlength="18" placeholder="hábito 1" autocomplete="off">
+            </div>
+            <div class="setup-row">
+                <button class="icon-chip" id="chip1" onclick="openIconPicker(1)"></button>
+                <input class="setup-input" id="hab2" maxlength="18" placeholder="hábito 2" autocomplete="off">
+            </div>
+            <div class="setup-row">
+                <button class="icon-chip" id="chip2" onclick="openIconPicker(2)"></button>
+                <input class="setup-input" id="hab3" maxlength="18" placeholder="hábito 3" autocomplete="off">
+            </div>
+            <div class="setup-row">
+                <button class="icon-chip" id="chip3" onclick="openIconPicker(3)"></button>
+                <input class="setup-input" id="hab4" maxlength="18" placeholder="hábito 4" autocomplete="off">
+            </div>
             <button class="setup-start" id="setupStart" onclick="startChallenge(event)">empezar</button>
+        </div>
+    </div>
+
+    <!-- ============ MODAL: NUEVO HÁBITO (mismo diseño de la app) ============ -->
+    <div class="modal-overlay hidden" id="habitModal" onclick="closeHabitModal()">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="modal-title">nuevo hábito</div>
+            <div class="icon-grid" id="modalIconGrid"></div>
+            <input class="setup-input" id="modalHabitName" maxlength="18" placeholder="nombre del hábito" autocomplete="off">
+            <div class="modal-actions">
+                <button class="modal-btn ghost" onclick="closeHabitModal()">cancelar</button>
+                <button class="modal-btn" onclick="confirmAddHabit()">agregar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MODAL: SELECTOR DE ÍCONO (setup) ============ -->
+    <div class="modal-overlay hidden" id="iconPicker" onclick="closeIconPicker()">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="modal-title">elige un ícono</div>
+            <div class="icon-grid" id="pickerGrid"></div>
         </div>
     </div>
 
@@ -806,6 +942,35 @@
             '<rect width="18" height="11" x="3" y="11" rx="2"/>' +
             '<path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
+        const CELL_LOCK_SVG =
+            '<svg class="cell-lock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+            'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<rect width="18" height="11" x="3" y="11" rx="2"/>' +
+            '<path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+
+        // ============ ÍCONOS DE HÁBITOS (estilo Lucide, mismo trazo de la app) ============
+        const HABIT_ICONS = {
+            sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+            moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+            activity: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"/>',
+            book: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+            heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+            droplet: '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
+            pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
+            phone: '<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
+            dollar: '<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+            zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>'
+        };
+
+        const ICON_IDS = Object.keys(HABIT_ICONS);
+
+        function iconSvg(id, cls) {
+            const inner = HABIT_ICONS[id] || HABIT_ICONS.zap;
+            return '<svg class="' + cls + '" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+                'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                inner + '</svg>';
+        }
+
         // ============ BLOQUES DE DESBLOQUEO ============
         // Solo los primeros 7 días están disponibles al inicio.
         // Cada bloque se desbloquea cumpliendo un % mínimo del anterior:
@@ -880,6 +1045,12 @@
                 if (!s.habits || !Array.isArray(s.habits)) {
                     s.habits = [];
                 }
+                // Íconos por hábito (nuevo): si faltan, asignar rayo por defecto
+                if (!s.icons || !Array.isArray(s.icons)) {
+                    s.icons = s.habits.map(() => 'zap');
+                }
+                while (s.icons.length < s.habits.length) s.icons.push('zap');
+                s.icons = s.icons.slice(0, s.habits.length);
                 if (!s.checks || !Array.isArray(s.checks)) {
                     s.checks = s.habits.map(() => Array(TOTAL_DAYS).fill(false));
                 }
@@ -910,6 +1081,7 @@
                 v: 2,
                 startDate: t.toISOString(),
                 habits: [],
+                icons: [],
                 checks: []
             };
             saveState();
@@ -952,11 +1124,14 @@
         function buildFixedCols() {
             const habits = state.habits;
 
-            // Columna HABITOS
+            // Columna HABITOS (ícono + nombre)
             let hHtml = '<div class="head">HABITOS</div>';
             habits.forEach((name, i) => {
                 const last = i === habits.length - 1 ? ' last' : '';
-                hHtml += '<div class="cell' + last + '">' + name + '</div>';
+                hHtml += '<div class="cell' + last + '">' +
+                    iconSvg(state.icons[i], 'habit-row-icon') +
+                    '<span class="habit-name-text">' + name + '</span>' +
+                '</div>';
             });
             document.getElementById('habitsCol').innerHTML = hHtml;
 
@@ -1001,11 +1176,16 @@
 
                 habits.forEach((_, h) => {
                     const last = h === habits.length - 1 ? ' last' : '';
-                    const checked = state.checks[h][day - 1] ? ' checked' : '';
-                    inner +=
-                        '<div class="cell' + last + '">' +
-                            '<div class="day-checkbox' + checked + '" data-habit="' + h + '" data-day="' + (day - 1) + '"></div>' +
-                        '</div>';
+                    if (blocked) {
+                        // Bloqueado absoluto: candado en lugar del checkbox
+                        inner += '<div class="cell' + last + '">' + CELL_LOCK_SVG + '</div>';
+                    } else {
+                        const checked = state.checks[h][day - 1] ? ' checked' : '';
+                        inner +=
+                            '<div class="cell' + last + '">' +
+                                '<div class="day-checkbox' + checked + '" data-habit="' + h + '" data-day="' + (day - 1) + '"></div>' +
+                            '</div>';
+                    }
                 });
 
                 col.innerHTML = inner;
@@ -1018,18 +1198,21 @@
 
         // RENDIMIENTO: un solo listener para todos los checkboxes (delegación)
         document.getElementById('daysTrack').addEventListener('click', function (e) {
-            const cb = e.target.closest('.day-checkbox');
-            if (!cb) return;
-            const col = cb.closest('.day-col');
-            if (!col || !col.classList.contains('current')) return;
+            const col = e.target.closest('.day-col');
+            if (!col) return;
 
-            // Día actual pero en bloque no desbloqueado
+            // Tramo bloqueado: informar qué falta (solo si es el día actual)
             if (col.classList.contains('blocked')) {
-                const b = blockOf(parseInt(col.dataset.day, 10));
-                alert('Bloqueado 🔒 Necesitas al menos ' + b.req + '% de cumplimiento en los días ' +
-                    b.prev[0] + ' al ' + b.prev[1] + ' para desbloquear este tramo.');
+                if (col.classList.contains('current')) {
+                    const b = blockOf(parseInt(col.dataset.day, 10));
+                    alert('Bloqueado 🔒 Necesitas al menos ' + b.req + '% de cumplimiento en los días ' +
+                        b.prev[0] + ' al ' + b.prev[1] + ' para desbloquear este tramo.');
+                }
                 return;
             }
+
+            const cb = e.target.closest('.day-checkbox');
+            if (!cb || !col.classList.contains('current')) return;
 
             const h = parseInt(cb.dataset.habit, 10);
             const d = parseInt(cb.dataset.day, 10);
@@ -1177,19 +1360,51 @@
             document.getElementById('addCount').textContent = n + ' de ' + MAX_HABITS + ' hábitos';
         }
 
+        // ============ AGREGAR HÁBITO: modal con el diseño de la app ============
+        let modalIcon = 'zap';
+
         function addHabit() {
             if (state.habits.length >= MAX_HABITS) {
                 alert('Máximo ' + MAX_HABITS + ' hábitos. Enfócate en cumplir los que ya tienes.');
                 return;
             }
 
-            const name = prompt('Nombre del nuevo hábito:');
-            if (!name || !name.trim()) return;
+            modalIcon = 'zap';
+            const grid = document.getElementById('modalIconGrid');
+            grid.innerHTML = ICON_IDS.map(id =>
+                '<button class="icon-opt' + (id === modalIcon ? ' selected' : '') + '" data-icon="' + id + '">' +
+                    iconSvg(id, '') +
+                '</button>'
+            ).join('');
 
-            state.habits.push(name.trim().slice(0, 18));
+            document.getElementById('modalHabitName').value = '';
+            document.getElementById('habitModal').classList.remove('hidden');
+            document.getElementById('modalHabitName').focus();
+        }
+
+        document.getElementById('modalIconGrid').addEventListener('click', function (e) {
+            const btn = e.target.closest('.icon-opt');
+            if (!btn) return;
+            modalIcon = btn.dataset.icon;
+            this.querySelectorAll('.icon-opt').forEach(b =>
+                b.classList.toggle('selected', b.dataset.icon === modalIcon)
+            );
+        });
+
+        function closeHabitModal() {
+            document.getElementById('habitModal').classList.add('hidden');
+        }
+
+        function confirmAddHabit() {
+            const name = document.getElementById('modalHabitName').value.trim().slice(0, 18);
+            if (!name) return;
+
+            state.habits.push(name);
+            state.icons.push(modalIcon);
             state.checks.push(Array(TOTAL_DAYS).fill(false));
             saveState();
 
+            closeHabitModal();
             buildBoard();
         }
 
@@ -1238,6 +1453,7 @@
         ];
 
         let introIndex = 0;
+        let introBusy = false; // evita que las frases se superpongan al tocar rápido
 
         function showIntro() {
             document.getElementById('intro').classList.remove('hidden');
@@ -1247,8 +1463,10 @@
         function nextIntroPhrase() {
             // Si ya está en el paso de digitar hábitos, no avanzar frases
             if (document.getElementById('setup').classList.contains('visible')) return;
+            if (introBusy) return; // transición en curso: ignorar el toque
             if (introIndex >= INTRO_PHRASES.length - 1) return;
 
+            introBusy = true;
             const el = document.getElementById('introPhrase');
             el.classList.add('fading');
 
@@ -1261,10 +1479,21 @@
                     document.getElementById('introHint').style.display = 'none';
                     document.getElementById('introStart').classList.add('visible');
                 }
-            }, 250);
+
+                // liberar cuando el fade-in termina
+                setTimeout(() => { introBusy = false; }, 260);
+            }, 260);
         }
 
-        // ============ PASO: DIGITA TUS 4 HÁBITOS ============
+        // ============ PASO: DIGITA TUS 4 HÁBITOS (con ícono) ============
+        const setupIcons = ['sun', 'activity', 'book', 'moon']; // sugeridos, cambiables
+
+        function renderChips() {
+            for (let i = 0; i < 4; i++) {
+                document.getElementById('chip' + i).innerHTML = iconSvg(setupIcons[i], '');
+            }
+        }
+
         function goToSetup(e) {
             e.stopPropagation();
 
@@ -1277,8 +1506,36 @@
             document.getElementById('introStart').classList.remove('visible');
             document.getElementById('introPhrase').textContent = 'empecemos con 4';
             document.getElementById('setup').classList.add('visible');
+            renderChips();
             document.getElementById('hab1').focus();
         }
+
+        // Selector de ícono (para las filas del setup)
+        let pickerTarget = null;
+
+        function openIconPicker(i) {
+            pickerTarget = i;
+            const grid = document.getElementById('pickerGrid');
+            grid.innerHTML = ICON_IDS.map(id =>
+                '<button class="icon-opt' + (setupIcons[i] === id ? ' selected' : '') + '" data-icon="' + id + '">' +
+                    iconSvg(id, '') +
+                '</button>'
+            ).join('');
+            document.getElementById('iconPicker').classList.remove('hidden');
+        }
+
+        function closeIconPicker() {
+            document.getElementById('iconPicker').classList.add('hidden');
+            pickerTarget = null;
+        }
+
+        document.getElementById('pickerGrid').addEventListener('click', function (e) {
+            const btn = e.target.closest('.icon-opt');
+            if (!btn || pickerTarget === null) return;
+            setupIcons[pickerTarget] = btn.dataset.icon;
+            renderChips();
+            closeIconPicker();
+        });
 
         function checkSetupReady() {
             const filled = ['hab1', 'hab2', 'hab3', 'hab4'].every(id =>
@@ -1301,6 +1558,7 @@
             if (names.length < MIN_HABITS) return;
 
             state.habits = names;
+            state.icons = setupIcons.slice(0, names.length);
             state.checks = names.map(() => Array(TOTAL_DAYS).fill(false));
 
             // El reto arranca oficialmente HOY, al digitar los hábitos
