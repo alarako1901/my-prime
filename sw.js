@@ -1,8 +1,8 @@
-// Service Worker de My Prime — v2
+// Service Worker de My Prime — v3
 // Estrategia:
 //  - HTML: network-first → cada deploy nuevo llega al instante (antes se quedaba en caché)
 //  - Íconos/manifest: cache-first → carga inmediata
-const CACHE = 'my-prime-v2';
+const CACHE = 'my-prime-v3';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', e => {

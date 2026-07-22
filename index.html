@@ -148,13 +148,12 @@
         .col-habitos-w .cell {
             justify-content: flex-start;
             padding-left: 10px;
+            padding-right: 6px;
             font-size: 13px;
             font-weight: 600;
             letter-spacing: -0.5px;
             border-right: 0.5px solid #1a1a1a;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .col-prime-w .cell {
@@ -567,6 +566,34 @@
         .setup-start:active { transform: scale(0.96); }
 
         .setup-row { display: flex; gap: 8px; align-items: center; width: 100%; }
+
+        .slot {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 13px 14px;
+            border: 2px dashed #999;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #999;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .slot.filled {
+            border-style: solid;
+            border-color: #1a1a1a;
+            color: #1a1a1a;
+        }
+
+        .slot-icon { display: flex; width: 22px; flex-shrink: 0; }
+        .slot-icon svg { width: 22px; height: 22px; }
+        .slot-text { flex: 1; }
+        .slot:active { transform: scale(0.98); }
         .setup-row .setup-input { flex: 1; }
 
         .icon-chip {
@@ -591,7 +618,14 @@
         /* Ícono junto al nombre del hábito */
         .habit-row-icon { width: 16px; height: 16px; flex-shrink: 0; }
         .col-habitos-w .cell { gap: 6px; }
-        .habit-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .habit-name-text {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.2;
+            word-break: break-word;
+        }
 
         /* ============ MODAL (mismo diseño de la app) ============ */
         .modal-overlay {
@@ -689,18 +723,26 @@
         .flash.hidden { display: none; }
 
         .flash-day {
-            font-family: 'Cascadia Code', monospace;
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 25px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            text-transform: uppercase;
+            color: #1a1a1a;
+            margin-bottom: 22px;
+            max-width: 320px;
         }
 
         .flash-text {
-            font-size: 26px;
+            font-size: 19px;
+            font-weight: 500;
+            color: #444;
             font-weight: 700;
             letter-spacing: -0.5px;
             line-height: 1.35;
             max-width: 320px;
+            white-space: pre-line;
         }
 
         .flash-hint {
@@ -1194,6 +1236,15 @@
             ver intro de nuevo
         </button>
 
+        <button class="drawer-item" onclick="exportProgress()">
+            guardar copia
+            <span class="hint">respaldo</span>
+        </button>
+
+        <button class="drawer-item" onclick="importProgress()">
+            restaurar copia
+        </button>
+
         <button class="drawer-item" onclick="resetChallenge()">
             reiniciar reto
             <span class="hint">borra todo</span>
@@ -1209,24 +1260,27 @@
 
         <!-- Paso final: el usuario digita SUS 4 hábitos con su ícono -->
         <div class="setup" id="setup" onclick="event.stopPropagation()">
-            <div class="setup-sub">digita tus 4 hábitos — ten en cuenta los pilares: cuerpo, mente, corazón, alma</div>
+            <div class="setup-sub">elige tus 4 hábitos — uno por cada pilar de tu PRIME</div>
 
-            <div class="setup-row">
-                <input class="setup-input" id="hab1" maxlength="18" placeholder="hábito 1" autocomplete="off">
-                <button class="row-list-btn" onclick="openChooser('setup', 0)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
-            </div>
-            <div class="setup-row">
-                <input class="setup-input" id="hab2" maxlength="18" placeholder="hábito 2" autocomplete="off">
-                <button class="row-list-btn" onclick="openChooser('setup', 1)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
-            </div>
-            <div class="setup-row">
-                <input class="setup-input" id="hab3" maxlength="18" placeholder="hábito 3" autocomplete="off">
-                <button class="row-list-btn" onclick="openChooser('setup', 2)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
-            </div>
-            <div class="setup-row">
-                <input class="setup-input" id="hab4" maxlength="18" placeholder="hábito 4" autocomplete="off">
-                <button class="row-list-btn" onclick="openChooser('setup', 3)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
-            </div>
+            <button class="slot" id="slot0" onclick="openChooser('setup', 0)">
+                <span class="slot-icon" id="slotIcon0"></span>
+                <span class="slot-text" id="slotText0">elegir hábito 1</span>
+            </button>
+            <button class="slot" id="slot1" onclick="openChooser('setup', 1)">
+                <span class="slot-icon" id="slotIcon1"></span>
+                <span class="slot-text" id="slotText1">elegir hábito 2</span>
+            </button>
+            <button class="slot" id="slot2" onclick="openChooser('setup', 2)">
+                <span class="slot-icon" id="slotIcon2"></span>
+                <span class="slot-text" id="slotText2">elegir hábito 3</span>
+            </button>
+            <button class="slot" id="slot3" onclick="openChooser('setup', 3)">
+                <span class="slot-icon" id="slotIcon3"></span>
+                <span class="slot-text" id="slotText3">elegir hábito 4</span>
+            </button>
+
+            <input type="hidden" id="hab1"><input type="hidden" id="hab2">
+            <input type="hidden" id="hab3"><input type="hidden" id="hab4">
 
             <button class="setup-start" id="setupStart" onclick="startChallenge(event)">empezar</button>
         </div>
@@ -1475,28 +1529,48 @@
                     'un día en blanco. ¿así quieres ser recordado?',
                     'ayer ganó tu versión débil. hoy le toca perder.',
                     'nadie va a venir a rescatarte. márcalo tú.',
-                    'perdiste ayer. si pierdes hoy, ya es decisión.'
+                    'perdiste ayer. si pierdes hoy, ya es decisión.',
+                    'el cero de ayer no se borra. el de hoy todavía se evita.',
+                    'no fue falta de tiempo. fue falta de ganas. admítelo y muévete.',
+                    'cada día que fallas, tu excusa se hace más fuerte que tú.',
+                    'ayer elegiste quedarte igual. hoy elige distinto.',
+                    'empezar es fácil. tú estás en la parte que importa.'
                 ],
                 low: [
                     'a medias no se destruye nada. ve con todo.',
                     'ayer hiciste lo mínimo. lo mínimo no te cambia.',
                     'estás en la fase de destrucción. destruye la pereza primero.',
                     'la mitad del camino es donde te rendiste antes.',
-                    'te falta hambre. búscala hoy.'
+                    'te falta hambre. búscala hoy.',
+                    'cumplir la mitad es entrenar para rendirte a la mitad.',
+                    'no negocies con la persona que quieres dejar de ser.',
+                    'lo hiciste a medias. hazlo completo o no lo llames intento.',
+                    'estás tibio. el cambio no pasa en tibio.',
+                    'tu lista no es una sugerencia. es tu palabra.'
                 ],
                 good: [
                     'vas rompiendo lo viejo. no aflojes ahora.',
                     'la destrucción duele. por eso funciona.',
                     'ayer cumpliste. hoy demuestra que no fue suerte.',
                     'tu versión antigua está incómoda. perfecto.',
-                    'sigue así y los primeros 7 caen solos.'
+                    'sigue así y los primeros 7 caen solos.',
+                    'lo que hoy te cuesta, en 20 días ni lo pensarás.',
+                    'estás incómodo. señal de que vas bien.',
+                    'ayer no fue perfecto, pero fue tuyo. hoy sube la vara.',
+                    'la constancia le gana al talento cuando el talento no aparece.',
+                    'no bajes el ritmo justo cuando empieza a funcionar.'
                 ],
                 perfect: [
                     'día perfecto. la destrucción ya empezó.',
                     '100%. así se le habla al espejo.',
                     'ayer no negociaste contigo. eso es poder.',
                     'perfecto ayer. lo difícil es repetirlo hoy. hazlo.',
-                    'cero excusas ayer. que hoy tampoco encuentren espacio.'
+                    'cero excusas ayer. que hoy tampoco encuentren espacio.',
+                    'así se ve el primer día del resto de tu vida.',
+                    'un día perfecto no cambia nada. una racha sí. sigue.',
+                    'te cumpliste. eso vale más que cualquier aplauso.',
+                    'tu palabra valió ayer. que valga hoy.',
+                    'la destrucción va rápido cuando no negocias.'
                 ]
             },
             p2: {
@@ -1505,28 +1579,48 @@
                     'un cero a estas alturas es traición a ti mismo.',
                     'llegaste lejos para regalar días. hoy se paga la deuda.',
                     'ayer te venció la pereza. hoy véncela tú.',
-                    'el que llega a la mitad y afloja, nunca sabe de lo que era capaz.'
+                    'el que llega a la mitad y afloja, nunca sabe de lo que era capaz.',
+                    'ya sabes hacerlo. ayer solo elegiste no hacerlo.',
+                    'no empieces de nuevo. continúa. hoy.',
+                    'un cero aquí borra semanas de trabajo. no lo repitas.',
+                    'lo construido no se cae por un día. se cae por dos.',
+                    'te conozco: mañana dirás que hoy debiste. hazlo hoy.'
                 ],
                 low: [
                     'ya no eres nuevo en esto. exígete como veterano.',
                     'implementar es repetir aunque aburra. repite.',
                     'a medias ya no te queda. tú ya probaste el 100.',
                     'la rutina te está probando. gánale.',
-                    'no llegaste hasta aquí para hacer lo mínimo.'
+                    'no llegaste hasta aquí para hacer lo mínimo.',
+                    'a estas alturas lo mínimo ya es un retroceso.',
+                    'no estás empezando. estás construyendo. constrúyelo bien.',
+                    'medias tintas hoy, resultados a medias en el día 66.',
+                    'sube el estándar. ya demostraste que puedes.',
+                    'el hábito se graba con repeticiones completas.'
                 ],
                 good: [
                     'el hábito ya se está escribiendo en ti. sigue grabándolo.',
                     'esto ya no es motivación. es disciplina. y la tienes.',
                     'cada check de hoy es un ladrillo que nadie te quita.',
                     'vas bien. y bien todavía no es tu techo.',
-                    'la mitad del reto quedó atrás. adelante solo hay versión nueva.'
+                    'la mitad del reto quedó atrás. adelante solo hay versión nueva.',
+                    'ya no lo haces por motivación. lo haces porque eres así.',
+                    'esto ya no se siente heroico. se siente normal. eso es ganar.',
+                    'sigue apilando días. el resultado es inevitable.',
+                    'la gente verá el cambio. tú ya lo estás viviendo.',
+                    'nadie te ve hacerlo. por eso cuenta doble.'
                 ],
                 perfect: [
                     'perfecto otra vez. esto ya es identidad.',
                     '100% en implementación. estás construyendo en serio.',
                     'los días perfectos se están volviendo tu normal.',
                     'ayer: impecable. hoy: repítelo sin pensar.',
-                    'así se ve alguien que decidió no volver atrás.'
+                    'así se ve alguien que decidió no volver atrás.',
+                    'perfecto ya no te sorprende. eso es identidad.',
+                    'lo estás haciendo sin drama. así se ve la disciplina real.',
+                    'tu yo del día 1 no te reconocería.',
+                    'esto ya no es un reto. es tu forma de vivir.',
+                    'repite. repite. repite. ahí está todo.'
                 ]
             },
             p3: {
@@ -1535,34 +1629,54 @@
                     'la integración se rompe con ceros. ayer fue el último.',
                     'no llegaste hasta aquí para caerte en la meta.',
                     'un día perdido en la recta final pesa doble. levántate.',
-                    'tu yo del día 1 estaría furioso. respóndele hoy.'
+                    'tu yo del día 1 estaría furioso. respóndele hoy.',
+                    'faltan pocos días. no los regales.',
+                    'caerse al final duele más. levántate rápido.',
+                    'todo el trabajo hecho merece un cierre digno.',
+                    'no dejes que el último capítulo sea el peor.',
+                    'un día. solo te pido hoy. cúmplelo.'
                 ],
                 low: [
                     'la recta final no perdona medias tintas.',
                     'estás a días de que sea automático. no lo sueltes.',
                     'integrar es no fallar cuando ya nadie te mira.',
                     'el final define la historia. escríbelo completo.',
-                    'lo que hagas estos días es lo que quedará para siempre.'
+                    'lo que hagas estos días es lo que quedará para siempre.',
+                    'el final se recuerda. haz que valga la pena.',
+                    'no sueltes ahora que ya casi es tuyo.',
+                    'lo que integras estos días te acompaña años.',
+                    'termina como empezaste: con todo.',
+                    'faltan pocos. dales el 100.'
                 ],
                 good: [
                     'ya casi es parte de ti. termina el trabajo.',
                     'la meta se ve. corre hacia ella, no camines.',
                     'estos son los días que separan a los que terminan.',
                     'tu constancia ya habla por ti. que grite en el final.',
-                    'falta poco. y poco es donde muchos se pierden. tú no.'
+                    'falta poco. y poco es donde muchos se pierden. tú no.',
+                    'ya casi no te cuesta. eso significa que funcionó.',
+                    'estás a días de decir "yo soy así".',
+                    'la meta está cerca. no bajes la cabeza.',
+                    'sigue. el 66 llega solo si no sueltas.',
+                    'lo difícil ya pasó. termina.'
                 ],
                 perfect: [
                     'perfecto en la recta final. esto ya eres tú.',
                     '100%. el hábito ya no te cuesta: te define.',
                     'estás integrando como un maestro. remata.',
                     'días perfectos al final: así se cierra un reto.',
-                    'ya no eres el mismo del día 1. y se nota.'
+                    'ya no eres el mismo del día 1. y se nota.',
+                    'esto ya es automático. lo lograste antes de terminar.',
+                    'cierra fuerte. te lo debes.',
+                    'perfecto otra vez. ya no hay vuelta atrás.',
+                    'el hábito ganó. tú ganaste.',
+                    'faltan días para el papel. tú ya cambiaste.'
                 ]
             },
             welcome: [
-                'día 1. hoy empieza todo.',
-                'bienvenido al día 1. las excusas se quedaron afuera.',
-                'hoy no necesitas motivación. necesitas empezar.'
+                'hoy empieza todo. las excusas se quedaron afuera.',
+                'no necesitas motivación. necesitas empezar.',
+                'el día 1 es el único que se elige. los otros 65 se ganan.'
             ],
             rewards: {
                 7: '7 días. lo lograste. te mereces salir con alguien que quieres.',
@@ -1635,7 +1749,9 @@
 
         function loadState() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
+                let raw = localStorage.getItem(STORAGE_KEY);
+                // Si el principal está corrupto o vacío, usar el respaldo
+                if (!raw) raw = localStorage.getItem(STORAGE_KEY + 'Backup');
                 if (!raw) return null;
                 const s = JSON.parse(raw);
                 if (!s || !s.startDate) return null;
@@ -1659,8 +1775,16 @@
                 s.pillars = s.pillars.map(p => Array.isArray(p) ? p : [p]);
                 while (s.pillars.length < s.habits.length) s.pillars.push(['cuerpo']);
                 s.pillars = s.pillars.slice(0, s.habits.length);
+                // Día en que nació cada hábito (los viejos, desde el 1)
+                if (!s.since || !Array.isArray(s.since)) {
+                    s.since = s.habits.map(() => 1);
+                }
+                while (s.since.length < s.habits.length) s.since.push(1);
+                s.since = s.since.slice(0, s.habits.length);
                 if (!s.celebrated || !Array.isArray(s.celebrated)) s.celebrated = [];
                 if (typeof s.lastFlash !== 'string') s.lastFlash = '';
+                if (typeof s.boostDay !== 'string') s.boostDay = '';
+                if (typeof s.boostCount !== 'number') s.boostCount = 0;
                 if (!s.checks || !Array.isArray(s.checks)) {
                     s.checks = s.habits.map(() => Array(TOTAL_DAYS).fill(false));
                 }
@@ -1678,9 +1802,55 @@
         }
 
         function saveState() {
+            const json = JSON.stringify(state);
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            } catch (e) {}
+                localStorage.setItem(STORAGE_KEY, json);
+                // Copia de respaldo: si la principal se corrompe, se recupera
+                localStorage.setItem(STORAGE_KEY + 'Backup', json);
+            } catch (e) {
+                // Cuota llena o modo privado: avisar UNA vez, no en silencio
+                if (!window._storageWarned) {
+                    window._storageWarned = true;
+                    alert('⚠️ No se pudo guardar tu progreso. Si estás en navegación privada, ábrela en modo normal.');
+                }
+            }
+        }
+
+        // ============ EXPORTAR / IMPORTAR PROGRESO ============
+        // Seguro de vida: 66 días no pueden depender de un solo teléfono.
+        function exportProgress() {
+            const data = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+            const blob = new Blob([data], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'my-prime-dia' + CURRENT_DAY + '.txt';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            closeDrawer();
+        }
+
+        function importProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            input.onchange = function () {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function () {
+                    try {
+                        const obj = JSON.parse(decodeURIComponent(escape(atob(reader.result.trim()))));
+                        if (!obj || !obj.startDate || !Array.isArray(obj.habits)) throw new Error('bad');
+                        if (!confirm('Esto reemplazará tu progreso actual. ¿Continuar?')) return;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+                        location.reload();
+                    } catch (err) {
+                        alert('El archivo no es válido.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
         }
 
         state = loadState();
@@ -1693,17 +1863,40 @@
                 habits: [],
                 icons: [],
                 pillars: [],
+                since: [],
                 checks: [],
                 celebrated: [],
-                lastFlash: ''
+                lastFlash: '',
+                boostDay: '',
+                boostCount: 0
             };
             saveState();
         }
 
+        // Día calculado por FECHA LOCAL (no por milisegundos): así el
+        // horario de verano o los husos no corren el reto un día.
+        function dayIndexFromDates(start, today) {
+            const a = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+            const b = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+            return Math.floor((b - a) / 86400000);
+        }
+
         const START_DATE = new Date(state.startDate);
         const _today = new Date(); _today.setHours(0, 0, 0, 0);
-        const _diff = Math.floor((_today - START_DATE) / 86400000);
+        const _diff = dayIndexFromDates(START_DATE, _today);
         const CURRENT_DAY = Math.min(Math.max(_diff + 1, 1), TOTAL_DAYS);
+
+        // ============ CRUCE DE MEDIANOCHE ============
+        // Si la app queda abierta y pasa la medianoche, el día actual
+        // quedaría congelado en ayer. Se detecta y se recarga.
+        function checkDayRollover() {
+            const now = new Date(); now.setHours(0, 0, 0, 0);
+            if (dayIndexFromDates(START_DATE, now) !== _diff) location.reload();
+        }
+        setInterval(checkDayRollover, 60000);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) checkDayRollover();
+        });
 
         // ============ TÍTULO DINÁMICO (por fase del reto) ============
         function updateTitle() {
@@ -1728,6 +1921,23 @@
         }
 
         // ============ CONSTRUCCIÓN DEL TABLERO ============
+        // "ENTRENAR" o "entrenar" → "Entrenar"
+        function capitalize(t) {
+            const v = String(t).trim();
+            if (!v) return v;
+            const esUniforme = v === v.toLowerCase() || v === v.toUpperCase();
+            // Si mezcló mayúsculas (ej. "Leer la Biblia"), se respeta su forma
+            const base = esUniforme ? v.toLowerCase() : v;
+            return base.charAt(0).toUpperCase() + base.slice(1);
+        }
+
+        // Un nombre con < > & rompía el tablero entero
+        function escapeHtml(t) {
+            return String(t).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
         function formatDate(d) {
             const dd = String(d.getDate()).padStart(2, '0');
             const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -1741,9 +1951,9 @@
             let hHtml = '<div class="head">HABITOS</div>';
             habits.forEach((name, i) => {
                 const last = i === habits.length - 1 ? ' last' : '';
-                hHtml += '<div class="cell' + last + '">' +
+                hHtml += '<div class="cell' + last + '" data-habit-row="' + i + '">' +
                     iconSvg(state.icons[i], 'habit-row-icon') +
-                    '<span class="habit-name-text">' + name + '</span>' +
+                    '<span class="habit-name-text">' + escapeHtml(name) + '</span>' +
                 '</div>';
             });
             document.getElementById('habitsCol').innerHTML = hHtml;
@@ -1848,10 +2058,14 @@
 
         // ============ PROGRESO POR HÁBITO ============
         function habitPercentage(h) {
+            const arr = state.checks[h] || [];
             let done = 0;
-            const arr = state.checks[h];
             for (let i = 0; i < arr.length; i++) if (arr[i]) done++;
-            return Math.round((done / TOTAL_DAYS) * 100);
+            // Se mide sobre los días en que el hábito EXISTE, no sobre
+            // los 66 completos: agregar un hábito tarde no lo condena.
+            const from = (state.since && state.since[h]) || 1;
+            const span = TOTAL_DAYS - from + 1;
+            return span > 0 ? Math.round((done / span) * 100) : 0;
         }
 
         function updateProgress(h) {
@@ -1879,11 +2093,13 @@
         // (esquina inferior izquierda, permanente). Desde ahí se
         // conectan los días.
         function dailyPercentage(dayIndex) {
+            const n = state.habits.length;
+            if (n === 0 || dayIndex < 0) return 0; // nunca NaN
             let done = 0;
-            for (let h = 0; h < state.habits.length; h++) {
-                if (state.checks[h][dayIndex]) done++;
+            for (let h = 0; h < n; h++) {
+                if (state.checks[h] && state.checks[h][dayIndex]) done++;
             }
-            return Math.round((done / state.habits.length) * 100);
+            return Math.round((done / n) * 100);
         }
 
         let chartRaf = null;
@@ -2129,16 +2345,71 @@
         }
 
         function confirmAddHabit() {
-            const name = document.getElementById('modalHabitName').value.trim().slice(0, 18);
+            const name = capitalize(document.getElementById('modalHabitName').value.trim().slice(0, 18));
             if (!name) return;
 
             state.habits.push(name);
             state.icons.push(modalIcon);
             state.pillars.push(modalPillarSet.slice());
+            state.since.push(CURRENT_DAY);
             state.checks.push(Array(TOTAL_DAYS).fill(false));
             saveState();
 
             closeHabitModal();
+            buildBoard();
+        }
+
+        // ============ EDITAR / ELIMINAR HÁBITO (mantener pulsado) ============
+        let pressTimer = null;
+
+        document.getElementById('habitsCol').addEventListener('pointerdown', function (e) {
+            const cell = e.target.closest('[data-habit-row]');
+            if (!cell) return;
+            const i = parseInt(cell.dataset.habitRow, 10);
+            pressTimer = setTimeout(() => {
+                if (navigator.vibrate) navigator.vibrate(20);
+                openHabitOptions(i);
+            }, 550);
+        });
+
+        ['pointerup', 'pointercancel', 'pointermove'].forEach(ev =>
+            document.getElementById('habitsCol').addEventListener(ev, () => {
+                clearTimeout(pressTimer);
+            })
+        );
+
+        function openHabitOptions(i) {
+            const name = state.habits[i];
+            document.getElementById('chooseCard').innerHTML =
+                '<div class="modal-title">' + escapeHtml(name) + '</div>' +
+                '<button class="modal-btn" onclick="renameHabit(' + i + ')">cambiar nombre</button>' +
+                '<button class="modal-btn" onclick="deleteHabit(' + i + ')">eliminar hábito</button>' +
+                '<button class="modal-btn ghost" onclick="closeChooser()">cancelar</button>';
+            document.getElementById('chooseModal').classList.remove('hidden');
+        }
+
+        function renameHabit(i) {
+            const nuevo = prompt('Nuevo nombre:', state.habits[i]);
+            closeChooser();
+            if (!nuevo || !nuevo.trim()) return;
+            state.habits[i] = capitalize(nuevo.trim().slice(0, 18));
+            saveState();
+            buildBoard();
+        }
+
+        function deleteHabit(i) {
+            closeChooser();
+            if (state.habits.length <= MIN_HABITS) {
+                alert('Mínimo ' + MIN_HABITS + ' hábitos. No puedes bajar de ahí.');
+                return;
+            }
+            if (!confirm('¿Eliminar "' + state.habits[i] + '"? Se borra su progreso.')) return;
+            state.habits.splice(i, 1);
+            state.icons.splice(i, 1);
+            state.pillars.splice(i, 1);
+            state.since.splice(i, 1);
+            state.checks.splice(i, 1);
+            saveState();
             buildBoard();
         }
 
@@ -2284,15 +2555,15 @@
 
         function renderChooserStep1() {
             document.getElementById('chooseCard').innerHTML =
-                '<div class="modal-title">elige un pilar</div>' +
+                '<div class="modal-title">elige un pilar para tu PRIME</div>' +
                 '<div class="pillar-grid-2">' +
                     PILLAR_IDS.map(pid =>
                         '<button class="pillar-big" onclick="renderChooserStep2(\'' + pid + '\')">' +
-                            pillarSvg(pid, '') + PILLARS[pid].name +
+                            pillarSvg(pid, '') + 'PRIME ' + PILLARS[pid].name +
                         '</button>'
                     ).join('') +
                 '</div>' +
-                '<button class="btn-custom" onclick="chooserCustom()">personalizado</button>';
+                '<button class="btn-custom" onclick="chooserCustom()">hábito personalizado</button>';
         }
 
         function renderChooserStep2(pid) {
@@ -2319,12 +2590,19 @@
                 '</div>';
         }
 
+        function paintSlot(i, name, icon) {
+            document.getElementById('slotIcon' + i).innerHTML = iconSvg(icon, '');
+            document.getElementById('slotText' + i).textContent = name;
+            document.getElementById('slot' + i).classList.add('filled');
+        }
+
         function chooserPick(pid, name, icon) {
             if (chooserMode === 'setup') {
                 document.getElementById('hab' + (chooserRow + 1)).value = name;
                 setupIcons[chooserRow] = icon;
                 setupPillars[chooserRow] = pid;
-                    checkSetupReady();
+                paintSlot(chooserRow, name, icon);
+                checkSetupReady();
                 closeChooser();
             } else {
                 if (state.habits.length >= MAX_HABITS) {
@@ -2335,6 +2613,7 @@
                 state.habits.push(name);
                 state.icons.push(icon);
                 state.pillars.push([pid]);
+                state.since.push(CURRENT_DAY);
                 state.checks.push(Array(TOTAL_DAYS).fill(false));
                 saveState();
                 closeChooser();
@@ -2343,13 +2622,34 @@
         }
 
         function chooserCustom() {
+            if (chooserMode !== 'setup') { closeChooser(); openCustomHabit(); return; }
+            // En el setup: primero el pilar, luego el nombre
+            renderChooserCustomSetup();
+        }
+
+        function renderChooserCustomSetup() {
+            document.getElementById('chooseCard').innerHTML =
+                '<button class="picker-back" onclick="renderChooserStep1()">← volver</button>' +
+                '<div class="modal-title">¿a qué pilar pertenece?</div>' +
+                '<div class="pillar-grid-2">' +
+                    PILLAR_IDS.map(pid =>
+                        '<button class="pillar-big" onclick="askCustomName(\'' + pid + '\')">' +
+                            pillarSvg(pid, '') + 'PRIME ' + PILLARS[pid].name +
+                        '</button>'
+                    ).join('') +
+                '</div>';
+        }
+
+        function askCustomName(pid) {
+            const nombre = prompt('Escribe tu hábito:');
+            if (!nombre || !nombre.trim()) return;
+            const name = capitalize(nombre.trim().slice(0, 18));
+            document.getElementById('hab' + (chooserRow + 1)).value = name;
+            setupIcons[chooserRow] = 'zap';
+            setupPillars[chooserRow] = pid;
+            paintSlot(chooserRow, name, 'zap');
+            checkSetupReady();
             closeChooser();
-            if (chooserMode === 'setup') {
-                // Escribe el suyo directamente en la fila (pilar = el de la fila)
-                document.getElementById('hab' + (chooserRow + 1)).focus();
-            } else {
-                openCustomHabit();
-            }
         }
 
         function checkSetupReady() {
@@ -2359,15 +2659,11 @@
             document.getElementById('setupStart').classList.toggle('ready', filled);
         }
 
-        ['hab1', 'hab2', 'hab3', 'hab4'].forEach(id => {
-            document.getElementById(id).addEventListener('input', checkSetupReady);
-        });
-
         function startChallenge(e) {
             e.stopPropagation();
 
             const names = ['hab1', 'hab2', 'hab3', 'hab4']
-                .map(id => document.getElementById(id).value.trim().slice(0, 18))
+                .map(id => capitalize(document.getElementById(id).value.trim().slice(0, 18)))
                 .filter(n => n.length > 0);
 
             if (names.length < MIN_HABITS) return;
@@ -2376,6 +2672,7 @@
             state.icons = setupIcons.slice(0, names.length);
             // Pilar por fila: el elegido en el selector (o el orden por defecto)
             state.pillars = setupPillars.slice(0, names.length).map(p => [p]);
+            state.since = names.map(() => 1); // los 4 iniciales nacen el día 1
             state.checks = names.map(() => Array(TOTAL_DAYS).fill(false));
 
             // El reto arranca oficialmente HOY, al digitar los hábitos
@@ -2466,13 +2763,15 @@
             const yPct = dailyPercentage(CURRENT_DAY - 2); // rendimiento de AYER
             const tier = yPct === 0 ? 'fail' : (yPct < 50 ? 'low' : (yPct < 100 ? 'good' : 'perfect'));
             const pool = MESSAGES[phase][tier];
-            return pool[CURRENT_DAY % pool.length]; // determinístico por día
+            // Hash del día: mismo mensaje si reabres hoy, pero sin ciclos cortos
+            const hash = (CURRENT_DAY * 2654435761) % 4294967296;
+            return pool[Math.floor(hash / 65536) % pool.length];
         }
 
         function maybeShowFlash() {
             // 1) ¿Reto completado? (los 66 días ya pasaron)
             if (rawDay > TOTAL_DAYS) {
-                showFlash('66 de 66', 'lo lograste. 66 días. este hábito ya es tuyo. ¿listo para el siguiente?', true);
+                showFlash('lo lograste', '66 días. este hábito ya es tuyo. ¿listo para el siguiente?', true);
                 return;
             }
 
@@ -2481,7 +2780,7 @@
                 if (CURRENT_DAY > lvl && !state.celebrated.includes(lvl)) {
                     state.celebrated.push(lvl);
                     saveState();
-                    showFlash('nivel ' + lvl + ' desbloqueado', MESSAGES.rewards[lvl]);
+                    showFlash(lvl + ' días seguidos', MESSAGES.rewards[lvl]);
                     return;
                 }
             }
@@ -2491,7 +2790,9 @@
             if (state.lastFlash !== tk) {
                 state.lastFlash = tk;
                 saveState();
-                showFlash('día ' + CURRENT_DAY + ' de ' + TOTAL_DAYS, pickDailyMessage());
+                showFlash(CURRENT_DAY === 1
+                    ? 'bienvenido al día 1'
+                    : 'día ' + CURRENT_DAY + ' de ' + TOTAL_DAYS, pickDailyMessage());
             }
         }
 
@@ -2530,18 +2831,60 @@
         ];
 
         let lastBoost = -1;
+        const BOOST_LIMIT = 3; // 3 al día: si estuviera siempre, dejaría de pesar
 
         function showMotivation() {
+            const tk = todayKey();
+            if (state.boostDay !== tk) { state.boostDay = tk; state.boostCount = 0; }
+
+            if (state.boostCount >= BOOST_LIMIT) {
+                showFlash('ya te di 3 hoy',
+                    'la motivación se acaba. la disciplina no. ve a cumplir tus hábitos.');
+                return;
+            }
+
+            state.boostCount++;
+            saveState();
+
             let i = Math.floor(Math.random() * BOOSTS.length);
             if (i === lastBoost) i = (i + 1) % BOOSTS.length; // no repetir seguido
             lastBoost = i;
-            showFlash('motivación', BOOSTS[i]);
+
+            const quedan = BOOST_LIMIT - state.boostCount;
+            showFlash('motivación', BOOSTS[i] +
+                (quedan > 0 ? '' : '\n\n(era la última de hoy)'));
+        }
+
+        // ============ AVISO DE RESPALDO ============
+        // A los 7 días de progreso, recordar guardar copia UNA vez
+        function maybeBackupReminder() {
+            if (CURRENT_DAY < 8 || state.backupWarned) return;
+            state.backupWarned = true;
+            saveState();
+            setTimeout(() => {
+                alert('🛡️ Llevas ' + (CURRENT_DAY - 1) + ' días.\n\nTu progreso vive solo en este teléfono. Si borras la app, se pierde.\n\nEntra al menú ☰ → "guardar copia" para tener un respaldo.');
+            }, 1200);
         }
 
         function restartAll(e) {
             e.stopPropagation();
+            // El reto terminado se guarda en el historial: la prueba
+            // de lo que lograste no se borra al empezar de nuevo.
+            try {
+                const hist = JSON.parse(localStorage.getItem('miPrimeHistory') || '[]');
+                let sum = 0;
+                for (let h = 0; h < state.habits.length; h++) sum += habitPercentage(h);
+                hist.push({
+                    end: new Date().toISOString(),
+                    habits: state.habits.slice(),
+                    score: state.habits.length ? Math.round(sum / state.habits.length) : 0
+                });
+                localStorage.setItem('miPrimeHistory', JSON.stringify(hist.slice(-10)));
+            } catch (err) {}
+
             try {
                 localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(STORAGE_KEY + 'Backup');
                 localStorage.removeItem('miPrimeIntroSeen');
             } catch (err) {}
             location.reload(); // vuelve a "hola": intro + nuevos hábitos
@@ -2564,6 +2907,7 @@
         } else {
             buildBoard();
             maybeShowFlash(); // mensaje del día / celebración / fin del reto
+            maybeBackupReminder();
         }
 
         // ============ PWA ============
