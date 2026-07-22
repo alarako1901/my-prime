@@ -901,15 +901,52 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            margin-top: 6px;
+            gap: 6px;
+            margin-top: 8px;
             font-family: 'Cascadia Code', monospace;
-            font-size: 11px;
+            font-size: 13px;
+            font-weight: 600;
             color: #1a1a1a;
         }
 
-        .streak svg { width: 14px; height: 14px; }
-        .streak.zero { color: #ccc; }
+        .streak svg { width: 19px; height: 19px; }
+        .streak.zero { color: #ccc; font-weight: 400; }
+
+        /* Llama ENCENDIDA: hoy está al 100% */
+        .streak.lit svg { color: #00d084; fill: rgba(0, 208, 132, 0.15); }
+
+        @keyframes streakPop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.5) rotate(-8deg); }
+            70% { transform: scale(1.2) rotate(6deg); }
+            100% { transform: scale(1); }
+        }
+
+        .streak.pop svg { animation: streakPop 0.6s ease; }
+
+        /* ============ BOTONES + / MOTIVACIÓN lado a lado ============ */
+        .add-btns {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .motiv-button {
+            width: 56px; height: 56px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a1a;
+            transition: transform 0.15s ease;
+            padding: 0;
+        }
+
+        .motiv-button svg { width: 26px; height: 26px; }
+        .motiv-button:active { transform: scale(0.92); }
 
         /* ============ SELECTOR PILAR → 10 HÁBITOS → PERSONALIZADO ============ */
         .row-list-btn {
@@ -951,6 +988,30 @@
         }
 
         .pillar-big svg { width: 26px; height: 26px; }
+
+        /* ============ BOTÓN DE MOTIVACIÓN ============ */
+        .boost-btn {
+            width: 48px; height: 48px;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #1a1a1a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .boost-btn svg { width: 24px; height: 24px; }
+        .boost-btn:active { transform: scale(0.92); }
+
+        .add-row-actions {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            justify-content: center;
+        }
 
         .btn-custom {
             padding: 13px;
@@ -1151,22 +1212,18 @@
             <div class="setup-sub">digita tus 4 hábitos — ten en cuenta los pilares: cuerpo, mente, corazón, alma</div>
 
             <div class="setup-row">
-                <button class="icon-chip" id="chip0" onclick="openIconPicker(0)"></button>
                 <input class="setup-input" id="hab1" maxlength="18" placeholder="hábito 1" autocomplete="off">
                 <button class="row-list-btn" onclick="openChooser('setup', 0)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
             </div>
             <div class="setup-row">
-                <button class="icon-chip" id="chip1" onclick="openIconPicker(1)"></button>
                 <input class="setup-input" id="hab2" maxlength="18" placeholder="hábito 2" autocomplete="off">
                 <button class="row-list-btn" onclick="openChooser('setup', 1)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
             </div>
             <div class="setup-row">
-                <button class="icon-chip" id="chip2" onclick="openIconPicker(2)"></button>
                 <input class="setup-input" id="hab3" maxlength="18" placeholder="hábito 3" autocomplete="off">
                 <button class="row-list-btn" onclick="openChooser('setup', 2)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
             </div>
             <div class="setup-row">
-                <button class="icon-chip" id="chip3" onclick="openIconPicker(3)"></button>
                 <input class="setup-input" id="hab4" maxlength="18" placeholder="hábito 4" autocomplete="off">
                 <button class="row-list-btn" onclick="openChooser('setup', 3)" title="Elegir de la lista"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
             </div>
@@ -1184,9 +1241,8 @@
     <div class="modal-overlay hidden" id="habitModal" onclick="closeHabitModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <div class="modal-title">nuevo hábito</div>
+            <div class="sugg-note" id="pillarHint"></div>
             <div class="pillar-select" id="modalPillars"></div>
-            <div class="sugg-note" id="suggNote"></div>
-            <div class="sugg-wrap" id="modalSuggs"></div>
             <div class="icon-grid" id="modalIconGrid"></div>
             <input class="setup-input" id="modalHabitName" maxlength="18" placeholder="nombre del hábito" autocomplete="off">
             <div class="modal-actions">
@@ -1196,13 +1252,6 @@
         </div>
     </div>
 
-    <!-- ============ MODAL: SELECTOR DE ÍCONO (setup) ============ -->
-    <div class="modal-overlay hidden" id="iconPicker" onclick="closeIconPicker()">
-        <div class="modal-card" onclick="event.stopPropagation()">
-            <div class="modal-title">elige un ícono</div>
-            <div class="icon-grid" id="pickerGrid"></div>
-        </div>
-    </div>
 
     <div class="container">
         <!-- ============ HEADER ============ -->
@@ -1235,7 +1284,10 @@
 
         <!-- ============ AGREGAR ============ -->
         <div class="add-row">
-            <button class="add-button" onclick="addHabit()" title="Agregar nuevo hábito">+</button>
+            <div class="add-btns">
+                <button class="add-button" onclick="addHabit()" title="Agregar nuevo hábito">+</button>
+                <button class="motiv-button" onclick="showMotivation()" title="Motivación"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg></button>
+            </div>
             <div class="add-label" id="addLabel">¿este será tu límite?</div>
             <div class="add-count" id="addCount"></div>
         </div>
@@ -1326,7 +1378,21 @@
             coffee: '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/>', // menos café / compartir uno
             // — ALMA —
             wind: '<path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/>', // respirar / meditar
-            zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>' // orar / propósito
+            bed: '<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>', // dormir bien
+            alarm: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/>', // despertar temprano
+            zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>', // orar / propósito
+            bed: '<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>', // dormir
+            alarm: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/>', // despertar temprano
+            footprints: '<path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z"/><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z"/><path d="M16 17h4"/><path d="M4 13h4"/>', // caminar / pasos
+            users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', // amigos / familia
+            phonecall: '<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>', // llamar
+            mail: '<path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/>', // escribir a alguien
+            utensils: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>', // cocinar
+            handshake: '<path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>', // acto bueno / servir
+            pray: '<path d="M12 21V10c0-1.1-.9-2-2-2s-2 .9-2 2v3"/><path d="M12 10c0-1.1.9-2 2-2s2 .9 2 2v3"/><path d="M8 13v4a4 4 0 0 0 8 0v-4"/><path d="M12 3v4"/>', // orar / gratitud
+            church: '<path d="M10 9h4"/><path d="M12 7v5"/><path d="M14 22v-4a2 2 0 0 0-4 0v4"/><path d="M18 22V5.618a1 1 0 0 0-.553-.894l-4.553-2.277a2 2 0 0 0-1.788 0L6.553 4.724A1 1 0 0 0 6 5.618V22"/><path d="m18 7 3.447 1.724a1 1 0 0 1 .553.894V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.618a1 1 0 0 1 .553-.894L6 7"/>', // misa
+            lightbulb: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>', // aprender / reflexionar
+            nosugar: '<path d="m2 2 20 20"/><path d="M12 20a8 8 0 0 0 8-8c0-2-1-3.9-3-5.5"/><path d="M8.5 4.5C10 6 11.5 8.4 12 11"/>' // sin azúcar
         };
 
         const ICON_IDS = Object.keys(HABIT_ICONS);
@@ -1370,31 +1436,31 @@
         // ============ SUGERENCIAS: 10 HÁBITOS POR PILAR ============
         const SUGGESTIONS = {
             cuerpo: [
-                { n: 'Entrenar', i: 'dumbbell' }, { n: 'Dormir bien', i: 'moon' },
-                { n: 'Tomar agua', i: 'droplet' }, { n: 'Despertar temprano', i: 'sun' },
+                { n: 'Entrenar', i: 'dumbbell' }, { n: 'Dormir bien', i: 'bed' },
+                { n: 'Tomar agua', i: 'droplet' }, { n: 'Despertar temprano', i: 'alarm' },
                 { n: 'Ducha fría', i: 'snowflake' }, { n: 'Comer sano', i: 'apple' },
-                { n: 'Caminar 30 min', i: 'activity' }, { n: 'Estirar', i: 'activity' },
-                { n: 'Sin azúcar', i: 'apple' }, { n: '10 mil pasos', i: 'activity' }
+                { n: 'Caminar 30 min', i: 'footprints' }, { n: 'Estirar', i: 'activity' },
+                { n: 'Sin azúcar', i: 'nosugar' }, { n: '10 mil pasos', i: 'footprints' }
             ],
             mente: [
                 { n: 'Leer', i: 'book' }, { n: 'Escuchar música', i: 'music' },
-                { n: 'Reflexionar', i: 'wind' }, { n: 'Escribir', i: 'pencil' },
+                { n: 'Reflexionar', i: 'lightbulb' }, { n: 'Escribir', i: 'pencil' },
                 { n: 'Sin scrolling', i: 'phone' }, { n: 'Estudiar', i: 'cap' },
-                { n: 'Aprender algo nuevo', i: 'cap' }, { n: 'Planear el día', i: 'clock' },
+                { n: 'Aprender algo nuevo', i: 'lightbulb' }, { n: 'Planear el día', i: 'clock' },
                 { n: 'Enfoque profundo', i: 'target' }, { n: 'Practicar un arte', i: 'music' }
             ],
             corazon: [
-                { n: 'Llamar a mamá', i: 'heart' }, { n: 'Jugar con amigos', i: 'heart' },
-                { n: 'Deporte con amigos', i: 'activity' }, { n: 'Tiempo en familia', i: 'home' },
-                { n: 'Escribir a un amigo', i: 'pencil' }, { n: 'Compartir un café', i: 'coffee' },
-                { n: 'Cocinar para alguien', i: 'home' }, { n: 'Agradecer a alguien', i: 'heart' },
+                { n: 'Llamar a mamá', i: 'phonecall' }, { n: 'Jugar con amigos', i: 'users' },
+                { n: 'Deporte con amigos', i: 'users' }, { n: 'Tiempo en familia', i: 'users' },
+                { n: 'Escribir a un amigo', i: 'mail' }, { n: 'Compartir un café', i: 'coffee' },
+                { n: 'Cocinar para alguien', i: 'utensils' }, { n: 'Agradecer a alguien', i: 'handshake' },
                 { n: 'Estar presente', i: 'phone' }, { n: 'Ayudar en casa', i: 'home' }
             ],
             alma: [
-                { n: 'Orar', i: 'zap' }, { n: 'Leer la Biblia', i: 'book' },
-                { n: 'Un acto bueno al día', i: 'heart' }, { n: 'Misa dominical', i: 'home' },
-                { n: 'Gratitud', i: 'heart' }, { n: 'Silencio 10 min', i: 'wind' },
-                { n: 'Perdonar', i: 'heart' }, { n: 'Servir a alguien', i: 'heart' },
+                { n: 'Orar', i: 'pray' }, { n: 'Leer la Biblia', i: 'book' },
+                { n: 'Un acto bueno al día', i: 'handshake' }, { n: 'Misa dominical', i: 'church' },
+                { n: 'Gratitud', i: 'pray' }, { n: 'Silencio 10 min', i: 'wind' },
+                { n: 'Perdonar', i: 'handshake' }, { n: 'Servir a alguien', i: 'handshake' },
                 { n: 'Reflexión nocturna', i: 'moon' }, { n: 'Meditar', i: 'wind' }
             ]
         };
@@ -1585,11 +1651,13 @@
                 }
                 while (s.icons.length < s.habits.length) s.icons.push('zap');
                 s.icons = s.icons.slice(0, s.habits.length);
-                // Pilar por hábito (nuevo): por defecto en orden cuerpo/mente/corazón/alma
+                // Pilar(es) por hábito: ahora cada hábito puede abarcar hasta 2
+                // pilares → se guardan como arrays (migración desde string)
                 if (!s.pillars || !Array.isArray(s.pillars)) {
-                    s.pillars = s.habits.map((_, i) => PILLAR_IDS[i % 4]);
+                    s.pillars = s.habits.map((_, i) => [PILLAR_IDS[i % 4]]);
                 }
-                while (s.pillars.length < s.habits.length) s.pillars.push('cuerpo');
+                s.pillars = s.pillars.map(p => Array.isArray(p) ? p : [p]);
+                while (s.pillars.length < s.habits.length) s.pillars.push(['cuerpo']);
                 s.pillars = s.pillars.slice(0, s.habits.length);
                 if (!s.celebrated || !Array.isArray(s.celebrated)) s.celebrated = [];
                 if (typeof s.lastFlash !== 'string') s.lastFlash = '';
@@ -1921,17 +1989,28 @@
             return streak;
         }
 
+        let lastStreakValue = null;
+
         function updateStreak() {
             const s = computeStreak();
             const el = document.getElementById('streakLine');
             el.classList.toggle('zero', s === 0);
             el.innerHTML = FLAME_SVG + (s === 1 ? '1 día seguido' : s + ' días seguidos');
+
+            // Día completo: la llama SE PRENDE (crece y brilla)
+            if (lastStreakValue !== null && s > lastStreakValue) {
+                el.classList.remove('ignited');
+                void el.offsetWidth; // reinicia la animación
+                el.classList.add('ignited');
+                if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
+            }
+            lastStreakValue = s;
         }
 
         // ============ PRIME POR PILAR (4 círculos pequeños) ============
         function pillarPercentage(pid) {
             const idxs = [];
-            state.pillars.forEach((p, i) => { if (p === pid) idxs.push(i); });
+            state.pillars.forEach((p, i) => { if (p.includes(pid)) idxs.push(i); });
             if (idxs.length === 0) return null; // sin hábitos de este pilar
             let sum = 0;
             idxs.forEach(i => { sum += habitPercentage(i); });
@@ -1970,33 +2049,22 @@
 
         // ============ AGREGAR HÁBITO: modal con pilar + sugerencias ============
         let modalIcon = 'zap';
-        let modalPillar = 'cuerpo';
+        let modalPillarSet = ['cuerpo']; // hasta 2 pilares por hábito
 
         function missingPillars() {
-            return PILLAR_IDS.filter(p => !state.pillars.includes(p));
+            return PILLAR_IDS.filter(p => !state.pillars.some(arr => arr.includes(p)));
         }
 
         function renderModalPillars() {
             document.getElementById('modalPillars').innerHTML = PILLAR_IDS.map(pid =>
-                '<button class="pillar-opt' + (pid === modalPillar ? ' selected' : '') + '" data-pillar="' + pid + '">' +
+                '<button class="pillar-opt' + (modalPillarSet.includes(pid) ? ' selected' : '') + '" data-pillar="' + pid + '">' +
                     pillarSvg(pid, '') + PILLARS[pid].name +
                 '</button>'
             ).join('');
-        }
-
-        function renderModalSuggs() {
-            const missing = missingPillars();
-            const note = document.getElementById('suggNote');
-            note.textContent = missing.includes(modalPillar)
-                ? 'te falta un hábito de ' + PILLARS[modalPillar].name.toLowerCase() + ' — buen momento'
-                : 'sugerencias de ' + PILLARS[modalPillar].name.toLowerCase() + ' (o escribe el tuyo)';
-
-            const taken = state.habits.map(h => h.toLowerCase());
-            document.getElementById('modalSuggs').innerHTML = SUGGESTIONS[modalPillar]
-                .filter(s => !taken.includes(s.n.toLowerCase()))
-                .slice(0, 6)
-                .map(s => '<button class="sugg-chip" data-name="' + s.n + '" data-icon="' + s.i + '">' + s.n + '</button>')
-                .join('');
+            document.getElementById('pillarHint').textContent =
+                modalPillarSet.length >= 2
+                    ? 'máximo 2 pilares — toca uno para quitarlo'
+                    : '¿qué pilares abarca? (puedes marcar hasta 2)';
         }
 
         function renderModalIcons() {
@@ -2019,10 +2087,9 @@
             modalIcon = 'zap';
             // Preseleccionar el pilar que le falta al usuario (balance)
             const missing = missingPillars();
-            modalPillar = missing.length ? missing[0] : 'cuerpo';
+            modalPillarSet = [missing.length ? missing[0] : 'cuerpo'];
 
             renderModalPillars();
-            renderModalSuggs();
             renderModalIcons();
 
             document.getElementById('modalHabitName').value = '';
@@ -2032,17 +2099,20 @@
         document.getElementById('modalPillars').addEventListener('click', function (e) {
             const btn = e.target.closest('.pillar-opt');
             if (!btn) return;
-            modalPillar = btn.dataset.pillar;
-            renderModalPillars();
-            renderModalSuggs();
-        });
+            const pid = btn.dataset.pillar;
+            const at = modalPillarSet.indexOf(pid);
 
-        document.getElementById('modalSuggs').addEventListener('click', function (e) {
-            const chip = e.target.closest('.sugg-chip');
-            if (!chip) return;
-            document.getElementById('modalHabitName').value = chip.dataset.name;
-            modalIcon = chip.dataset.icon;
-            renderModalIcons();
+            if (at >= 0) {
+                // No dejar el hábito sin ningún pilar
+                if (modalPillarSet.length > 1) modalPillarSet.splice(at, 1);
+            } else if (modalPillarSet.length < 2) {
+                modalPillarSet.push(pid);
+            } else {
+                // Ya hay 2: el nuevo reemplaza al primero elegido
+                modalPillarSet.shift();
+                modalPillarSet.push(pid);
+            }
+            renderModalPillars();
         });
 
         document.getElementById('modalIconGrid').addEventListener('click', function (e) {
@@ -2064,7 +2134,7 @@
 
             state.habits.push(name);
             state.icons.push(modalIcon);
-            state.pillars.push(modalPillar);
+            state.pillars.push(modalPillarSet.slice());
             state.checks.push(Array(TOTAL_DAYS).fill(false));
             saveState();
 
@@ -2175,15 +2245,9 @@
             }, 160);
         }
 
-        // ============ PASO: DIGITA TUS 4 HÁBITOS (con ícono) ============
-        // Sugeridos por pilar: cuerpo, mente, corazón, alma (cambiables)
-        const setupIcons = ['dumbbell', 'book', 'heart', 'zap'];
-
-        function renderChips() {
-            for (let i = 0; i < 4; i++) {
-                document.getElementById('chip' + i).innerHTML = iconSvg(setupIcons[i], '');
-            }
-        }
+        // ============ PASO: DIGITA TUS 4 HÁBITOS ============
+        // Sin íconos preasignados: el ícono llega solo al elegir el hábito
+        const setupIcons = ['zap', 'zap', 'zap', 'zap'];
 
         // Pilar de cada fila del setup (por defecto en orden; el chooser lo cambia)
         const setupPillars = ['cuerpo', 'mente', 'corazon', 'alma'];
@@ -2200,7 +2264,6 @@
             document.getElementById('introStart').classList.remove('visible');
             document.getElementById('introPhrase').textContent = 'empecemos con 4';
             document.getElementById('setup').classList.add('visible');
-            renderChips();
         }
 
         // ============ CHOOSER: 4 PILARES → 10 HÁBITOS → PERSONALIZADO ============
@@ -2261,8 +2324,7 @@
                 document.getElementById('hab' + (chooserRow + 1)).value = name;
                 setupIcons[chooserRow] = icon;
                 setupPillars[chooserRow] = pid;
-                renderChips();
-                checkSetupReady();
+                    checkSetupReady();
                 closeChooser();
             } else {
                 if (state.habits.length >= MAX_HABITS) {
@@ -2272,7 +2334,7 @@
                 }
                 state.habits.push(name);
                 state.icons.push(icon);
-                state.pillars.push(pid);
+                state.pillars.push([pid]);
                 state.checks.push(Array(TOTAL_DAYS).fill(false));
                 saveState();
                 closeChooser();
@@ -2289,33 +2351,6 @@
                 openCustomHabit();
             }
         }
-
-        // Selector de ícono (para las filas del setup)
-        let pickerTarget = null;
-
-        function openIconPicker(i) {
-            pickerTarget = i;
-            const grid = document.getElementById('pickerGrid');
-            grid.innerHTML = ICON_IDS.map(id =>
-                '<button class="icon-opt' + (setupIcons[i] === id ? ' selected' : '') + '" data-icon="' + id + '">' +
-                    iconSvg(id, '') +
-                '</button>'
-            ).join('');
-            document.getElementById('iconPicker').classList.remove('hidden');
-        }
-
-        function closeIconPicker() {
-            document.getElementById('iconPicker').classList.add('hidden');
-            pickerTarget = null;
-        }
-
-        document.getElementById('pickerGrid').addEventListener('click', function (e) {
-            const btn = e.target.closest('.icon-opt');
-            if (!btn || pickerTarget === null) return;
-            setupIcons[pickerTarget] = btn.dataset.icon;
-            renderChips();
-            closeIconPicker();
-        });
 
         function checkSetupReady() {
             const filled = ['hab1', 'hab2', 'hab3', 'hab4'].every(id =>
@@ -2340,7 +2375,7 @@
             state.habits = names;
             state.icons = setupIcons.slice(0, names.length);
             // Pilar por fila: el elegido en el selector (o el orden por defecto)
-            state.pillars = setupPillars.slice(0, names.length);
+            state.pillars = setupPillars.slice(0, names.length).map(p => [p]);
             state.checks = names.map(() => Array(TOTAL_DAYS).fill(false));
 
             // El reto arranca oficialmente HOY, al digitar los hábitos
@@ -2458,6 +2493,49 @@
                 saveState();
                 showFlash('día ' + CURRENT_DAY + ' de ' + TOTAL_DAYS, pickDailyMessage());
             }
+        }
+
+        // ============ BOTÓN DE MOTIVACIÓN (a mil, cuando lo necesites) ============
+        const BOOSTS = [
+            'no estás cansado. estás cómodo. levántate.',
+            'la pereza es un lujo que tu futuro no puede pagar.',
+            'nadie viene. eres tú o nadie.',
+            'duele ahora o duele toda la vida. elige.',
+            'tu excusa favorita es la razón por la que sigues igual.',
+            'el que se rinde no descansa: se acostumbra.',
+            'hazlo mal, pero hazlo. la perfección es otra excusa.',
+            'tu cuerpo puede. es tu mente la que negocia.',
+            'no cuentes los días. haz que los días cuenten.',
+            'si fuera fácil, cualquiera sería quien tú quieres ser.',
+            'el dolor de la disciplina pesa gramos. el del arrepentimiento, toneladas.',
+            'no necesitas ganas. necesitas empezar.',
+            'la motivación se acaba en 20 minutos. la costumbre dura años.',
+            'estás a un hábito de distancia de otra vida.',
+            'la versión de ti que admiras se levantó cuando no quería.',
+            'nadie aplaude los días invisibles. igual hazlos.',
+            'no bajes la meta. sube el esfuerzo.',
+            'lo difícil de hoy es lo normal de mañana.',
+            'te vas a acordar de este día: por lo que hiciste o por lo que no.',
+            'un día más igual es un día menos de vida distinta.',
+            'no eres flojo. estás desentrenado. entrena.',
+            'el reto no es de 66 días. es de un día, 66 veces.',
+            'deja de esperar el lunes. hoy también existe.',
+            'lo que evitas hoy te espera mañana, más grande.',
+            'campeón no es el que nunca falla. es el que vuelve al día siguiente.',
+            'tu palabra vale lo que valen tus checks.',
+            'estás construyendo a alguien. no lo abandones a medias.',
+            'la incomodidad es la señal de que está funcionando.',
+            'si lo dejas hoy, ¿qué te hace pensar que mañana será distinto?',
+            'no lo hagas por ganas. hazlo por respeto a ti.'
+        ];
+
+        let lastBoost = -1;
+
+        function showMotivation() {
+            let i = Math.floor(Math.random() * BOOSTS.length);
+            if (i === lastBoost) i = (i + 1) % BOOSTS.length; // no repetir seguido
+            lastBoost = i;
+            showFlash('motivación', BOOSTS[i]);
         }
 
         function restartAll(e) {
