@@ -951,11 +951,18 @@
             color: #1a1a1a;
         }
 
-        .streak svg { width: 19px; height: 19px; }
+        .streak svg { width: 19px; height: 19px; transition: all 0.3s ease; }
         .streak.zero { color: #ccc; font-weight: 400; }
 
-        /* Llama ENCENDIDA: hoy está al 100% */
-        .streak.lit svg { color: #00d084; fill: rgba(0, 208, 132, 0.15); }
+        /* Llama ENCENDIDA: hoy está al 100% — verde, más grande y con brillo */
+        .streak.lit { color: #00a866; font-weight: 700; }
+        .streak.lit svg {
+            color: #00d084;
+            fill: rgba(0, 208, 132, 0.25);
+            width: 24px;
+            height: 24px;
+            filter: drop-shadow(0 0 6px rgba(0, 208, 132, 0.5));
+        }
 
         @keyframes streakPop {
             0% { transform: scale(1); }
@@ -1139,6 +1146,18 @@
 
         .drawer.open { transform: translateX(0); }
 
+        .drawer-version {
+            margin-top: auto;
+            padding: 16px 4px 4px;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 11px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .drawer-version b { color: #1a1a1a; font-weight: 600; }
+
         .drawer-title {
             font-size: 14px;
             font-weight: 700;
@@ -1249,6 +1268,8 @@
             reiniciar reto
             <span class="hint">borra todo</span>
         </button>
+
+        <div class="drawer-version" id="drawerVersion" onclick="checkForUpdate()"></div>
     </div>
 
     <!-- ============ INTRO ============ -->
@@ -1380,6 +1401,7 @@
         'use strict';
 
         // ============ CONFIGURACIÓN ============
+        const APP_VERSION = '1.27.0'; // súbelo en cada deploy (mayor.menor.parche)
         const TOTAL_DAYS = 66;
         const LEVELS = [7, 15, 30, 66];
         const MIN_HABITS = 4;
@@ -1700,13 +1722,17 @@
         ];
 
         function rangeCompliance(s, e) {
-            // % de checks cumplidos en el rango de días [s, e]
+            // % de cumplimiento en [s, e], contando cada hábito SOLO desde
+            // el día en que existe: un hábito agregado tarde no arrastra
+            // días vacíos retroactivos que re-bloqueen tramos ya ganados.
             const habitsN = state.habits.length;
-            const total = habitsN * (e - s + 1);
-            let done = 0;
+            let total = 0, done = 0;
             for (let h = 0; h < habitsN; h++) {
-                for (let d = s - 1; d < e; d++) {
-                    if (state.checks[h][d]) done++;
+                const from = (state.since && state.since[h]) || 1;
+                for (let day = s; day <= e; day++) {
+                    if (day < from) continue; // el hábito aún no nacía
+                    total++;
+                    if (state.checks[h] && state.checks[h][day - 1]) done++;
                 }
             }
             return total > 0 ? Math.round((done / total) * 100) : 0;
@@ -2095,11 +2121,16 @@
         function dailyPercentage(dayIndex) {
             const n = state.habits.length;
             if (n === 0 || dayIndex < 0) return 0; // nunca NaN
-            let done = 0;
+            const day = dayIndex + 1;
+            let total = 0, done = 0;
             for (let h = 0; h < n; h++) {
+                const from = (state.since && state.since[h]) || 1;
+                if (day < from) continue; // ese día el hábito aún no existía
+                total++;
                 if (state.checks[h] && state.checks[h][dayIndex]) done++;
             }
-            return Math.round((done / n) * 100);
+            // Días previos a cualquier hábito: 0% (no NaN)
+            return total > 0 ? Math.round((done / total) * 100) : 0;
         }
 
         let chartRaf = null;
@@ -2205,22 +2236,26 @@
             return streak;
         }
 
-        let lastStreakValue = null;
+        let lastTodayComplete = null;
 
         function updateStreak() {
             const s = computeStreak();
             const el = document.getElementById('streakLine');
+            const hoyCompleto = dailyPercentage(CURRENT_DAY - 1) === 100;
+
             el.classList.toggle('zero', s === 0);
+            // Llama VERDE y encendida mientras el día de hoy esté al 100%
+            el.classList.toggle('lit', hoyCompleto);
             el.innerHTML = FLAME_SVG + (s === 1 ? '1 día seguido' : s + ' días seguidos');
 
-            // Día completo: la llama SE PRENDE (crece y brilla)
-            if (lastStreakValue !== null && s > lastStreakValue) {
-                el.classList.remove('ignited');
-                void el.offsetWidth; // reinicia la animación
-                el.classList.add('ignited');
+            // Al pasar de incompleto → completo: la llama crece (pop) y vibra
+            if (lastTodayComplete === false && hoyCompleto) {
+                void el.offsetWidth;      // reinicia la animación
+                el.classList.add('pop');
+                setTimeout(() => el.classList.remove('pop'), 650);
                 if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
             }
-            lastStreakValue = s;
+            lastTodayComplete = hoyCompleto;
         }
 
         // ============ PRIME POR PILAR (4 círculos pequeños) ============
@@ -2866,6 +2901,45 @@
             }, 1200);
         }
 
+        // ============ VERSIÓN Y ACTUALIZACIÓN ============
+        // Muestra la versión instalada. Al tocarla, busca en el servidor si
+        // hay una más nueva y la trae SIN tocar el progreso (vive aparte,
+        // en localStorage, así que una actualización nunca lo borra).
+        function renderVersion(estado) {
+            document.getElementById('drawerVersion').innerHTML =
+                'My Prime <b>v' + APP_VERSION + '</b>' +
+                (estado ? '<br>' + estado : '<br>toca para buscar actualización');
+        }
+
+        async function checkForUpdate() {
+            renderVersion('buscando…');
+            try {
+                // ?t= evita la caché: siempre pregunta al servidor
+                const res = await fetch('./index.html?t=' + Date.now(), { cache: 'no-store' });
+                const html = await res.text();
+                const m = html.match(/APP_VERSION\s*=\s*'([\d.]+)'/);
+                const serverV = m ? m[1] : null;
+
+                if (serverV && serverV !== APP_VERSION) {
+                    renderVersion('nueva versión v' + serverV + ' — actualizando…');
+                    // Limpiar cachés del service worker y recargar limpio
+                    if ('caches' in window) {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map(k => caches.delete(k)));
+                    }
+                    if (navigator.serviceWorker) {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        await Promise.all(regs.map(r => r.update()));
+                    }
+                    setTimeout(() => location.reload(true), 800);
+                } else {
+                    renderVersion('ya tienes la última ✓');
+                }
+            } catch (err) {
+                renderVersion('sin conexión — intenta luego');
+            }
+        }
+
         function restartAll(e) {
             e.stopPropagation();
             // El reto terminado se guarda en el historial: la prueba
@@ -2909,6 +2983,8 @@
             maybeShowFlash(); // mensaje del día / celebración / fin del reto
             maybeBackupReminder();
         }
+
+        renderVersion();
 
         // ============ PWA ============
         if ('serviceWorker' in navigator) {

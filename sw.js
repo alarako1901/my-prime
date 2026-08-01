@@ -2,7 +2,7 @@
 // Estrategia:
 //  - HTML: network-first → cada deploy nuevo llega al instante (antes se quedaba en caché)
 //  - Íconos/manifest: cache-first → carga inmediata
-const CACHE = 'my-prime-v3';
+const CACHE = 'my-prime-v1.27.0';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', e => {
